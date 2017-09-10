@@ -2,3 +2,5 @@ private_env.sh
 access.log
 .caddy
 *.password
+.circle_token
+crontab
