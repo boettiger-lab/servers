@@ -1,0 +1,46 @@
+chameleon.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+  gzip
+  markdown
+  log
+
+  proxy /carl carl:8787 {
+    without /carl
+    header_upstream Host {host}/carl
+    transparent
+  }
+  redir /carl /rstudio/ 307
+
+  proxy /milad milad:8787 {
+    without /milad
+    header_upstream Host {host}/milad
+    transparent
+  }
+  redir /milad /milad/ 307
+
+  proxy /allie allie:8787 {
+    without /allie
+    header_upstream Host {host}/allie
+    transparent
+  }
+  redir /allie /allie/ 307
+
+  proxy /kari kari:8787 {
+    without /kari
+    header_upstream Host {host}/kari
+    transparent
+  }
+  redir /kari /kari/ 307
+
+
+}
+
+status.chameleon.carlboettiger.info {
+
+  tls cboettig@gmail.com
+  proxy / netdata:19999
+
+
+}
+

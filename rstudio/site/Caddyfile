@@ -1,0 +1,20 @@
+44-core.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+
+  proxy / rstudio:8787 {
+    transparent
+  }
+
+}
+
+
+monitor.44-core.carlboettiger.info {
+
+  tls cboettig@gmail.com
+  proxy / monitor:19999 
+
+}
+
+
+

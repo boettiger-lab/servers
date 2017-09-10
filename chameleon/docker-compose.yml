@@ -1,0 +1,60 @@
+version: "2"
+services: 
+  caddy:  
+    image: joshix/caddy
+    links:
+      - carl
+      - kari 
+      - milad 
+      - allie
+      - netdata 
+    volumes:
+      - ./site/:/var/www/html
+      - ./.caddy/:/.caddy
+    ports:
+      - 80:80
+      - 443:443
+    restart: always
+
+  allie:
+    image: cboettig/labnotebook
+    env_file: allie.password
+    volumes:
+      - $HOME/allie:/home/rstudio/projects
+    restart: always
+
+  milad:
+    image: cboettig/labnotebook
+    env_file: milad.password
+    volumes:
+      - $HOME/milad:/home/rstudio/projects
+    restart: always
+
+  kari:
+    image: cboettig/labnotebook 
+    env_file: kari.password 
+    volumes:
+      - $HOME/kari:/home/rstudio/projects
+    restart: always
+
+
+  carl:
+    image: cboettig/labnotebook 
+    env_file: carl.password 
+    volumes:
+      - $HOME/projects:/home/rstudio/projects
+      - $HOME/services/site/logs:/home/rstudio/logs
+    restart: always
+
+  netdata:
+    image: titpetric/netdata  
+    cap_add:
+      - SYS_PTRACE
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - ./netdata.conf:/etc/netdata/netdata.conf
+    restart: always
+
+
+

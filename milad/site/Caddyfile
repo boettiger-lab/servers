@@ -1,0 +1,11 @@
+milad.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+
+  proxy / rstudio:8787 {
+    header_upstream Host {host}
+  }
+
+}
+
+
