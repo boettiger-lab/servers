@@ -9,7 +9,7 @@
 }
 
 
-monitor.44-core.carlboettiger.info {
+status.44-core.carlboettiger.info {
 
   tls cboettig@gmail.com
   proxy / monitor:19999 
