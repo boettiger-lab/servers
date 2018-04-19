@@ -14,6 +14,7 @@ services:
       - 80:80
       - 443:443
     restart: always
+    command: "--agree=true"
 
   rstudio:
     image: cboettig/labnotebook
