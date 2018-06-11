@@ -1,12 +1,12 @@
 version: '2'
 
-services: 
-  caddy:  
+services:
+  caddy:
     image: joshix/caddy
     links:
-      - monitor 
-      - rstudio 
-   ## public files in site, .caddy holds letsencrypt certs 
+      - monitor
+      - rstudio
+   ## public files in site, .caddy holds letsencrypt certs
     volumes:
       - ./site/:/var/www/html
       - ./.caddy/:/.caddy
@@ -19,7 +19,7 @@ services:
   rstudio:
     image: cboettig/labnotebook
     restart: always
-    volumes: 
+    volumes:
       - $HOME/projects:/home/rstudio/projects
     env_file: ./private_env.sh
 
@@ -33,7 +33,17 @@ services:
       - /sys:/host/sys:ro
       - ./netdata.conf:/etc/netdata/netdata.conf
     ports:
-      - 19999:19999 
+      - 19999:19999
+
+  mariadb:
+      image: mariadb
+      environment:
+          - MYSQL_ROOT_PASSWORD=password
+  postgres:
+      image: postgres
+      environment:
+          - POSTGRES_PASSWORD=password
+
 
 
 
