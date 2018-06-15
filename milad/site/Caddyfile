@@ -4,6 +4,8 @@ milad.carlboettiger.info {
 
   proxy / rstudio:8787 {
     header_upstream Host {host}
+    websocket
+    transparent
   }
 
 }

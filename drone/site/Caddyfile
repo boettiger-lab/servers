@@ -11,6 +11,7 @@ drone.carlboettiger.info {
   proxy /rstudio rstudio:8787 {
     without /rstudio
     header_upstream Host {host}/rstudio
+    websocket
     transparent
   }
   redir /rstudio /rstudio/ 307
