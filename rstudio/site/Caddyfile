@@ -3,6 +3,7 @@ rstudio.carlboettiger.info {
   tls cboettig@gmail.com
 
   proxy / rstudio:8787 {
+    websocket
     transparent
   }
 
