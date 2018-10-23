@@ -10,8 +10,8 @@ Welcome to the [Boettiger Lab](https://carlboettiger.info) [Chameleon server](ht
 - [Allie login](/allie/auth-sign-in)
 - [Allie session](/allie)
 
-- [Milad login](/milad/auth-sign-in)
-- [Milad session](/milad)
+- [Millie login](/millie/auth-sign-in)
+- [Millie session](/millie)
 
 - [Kari login](/kari/auth-sign-in)
 - [Kari session](/kari)
