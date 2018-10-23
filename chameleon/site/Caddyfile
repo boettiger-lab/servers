@@ -12,12 +12,12 @@ chameleon.carlboettiger.info {
   }
   redir /carl /rstudio/ 307
 
-  proxy /milad milad:8787 {
-    without /milad
-    header_upstream Host {host}/milad
+  proxy /millie milad:8787 {
+    without /millie
+    header_upstream Host {host}/millie
     transparent
   }
-  redir /milad /milad/ 307
+  redir /millie /milad/ 307
 
   proxy /allie allie:8787 {
     without /allie

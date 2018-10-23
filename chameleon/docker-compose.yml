@@ -5,7 +5,7 @@ services:
     links:
       - carl
       - kari 
-      - milad 
+      - millie 
       - allie
       - netdata 
     volumes:
@@ -18,21 +18,21 @@ services:
 
   allie:
     image: cboettig/labnotebook
-    env_file: allie.password
+    env_file: .password
     volumes:
       - $HOME/allie:/home/rstudio/projects
     restart: always
 
-  milad:
+  millie:
     image: cboettig/labnotebook
-    env_file: milad.password
+    env_file: .password
     volumes:
-      - $HOME/milad:/home/rstudio/projects
+      - $HOME/millie:/home/rstudio/projects
     restart: always
 
   kari:
     image: cboettig/labnotebook 
-    env_file: kari.password 
+    env_file: .password 
     volumes:
       - $HOME/kari:/home/rstudio/projects
     restart: always
@@ -40,7 +40,7 @@ services:
 
   carl:
     image: cboettig/labnotebook 
-    env_file: carl.password 
+    env_file: .password 
     volumes:
       - $HOME/projects:/home/rstudio/projects
       - $HOME/services/site/logs:/home/rstudio/logs
@@ -56,5 +56,22 @@ services:
       - ./netdata.conf:/etc/netdata/netdata.conf
     restart: always
 
+  mariadb:
+      image: mariadb
+      environment:
+          - MYSQL_ROOT_PASSWORD=password
+  postgres:
+      image: postgres
+      environment:
+          - POSTGRES_PASSWORD=password
 
+  virtuoso:
+    image: tenforce/virtuoso:1.3.1-virtuoso7.2.2
+    environment:
+      SPARQL_UPDATE: "true"
+      DEFAULT_GRAPH: "http://www.example.com/my-graph"
+    volumes:
+      - ./data/virtuoso:/data
+#    ports:
+#      - "8890:8890"
 
