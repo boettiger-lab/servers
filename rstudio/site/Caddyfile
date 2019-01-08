@@ -1,4 +1,4 @@
-rstudio.carlboettiger.info {
+compute.carlboettiger.info {
   
   tls cboettig@gmail.com
 
@@ -11,7 +11,7 @@ rstudio.carlboettiger.info {
 }
 
 
-status.rstudio.carlboettiger.info {
+status.compute.carlboettiger.info {
 
   tls cboettig@gmail.com
   proxy / monitor:19999 
