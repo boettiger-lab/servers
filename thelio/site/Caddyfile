@@ -1,0 +1,22 @@
+thelio.dyn.berkeley.edu {
+  
+  tls cboettig@gmail.com
+
+  proxy / rstudio:8787 {
+    header_upstream Host {host}
+    websocket
+    transparent
+  }
+
+}
+
+
+# status.compute.carlboettiger.info {
+#
+#  tls cboettig@gmail.com
+#  proxy / monitor:19999 
+#
+#}
+
+
+
