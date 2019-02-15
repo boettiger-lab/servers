@@ -1,17 +1,17 @@
 ---
-Title: Chameleon server 
+Title: TAAC server 
 
 ---
 
-Welcome to the [Boettiger Lab](https://carlboettiger.info) [Chameleon server](https://chameleon.carlboettiger.info).
+Welcome to the [Boettiger Lab](https://carlboettiger.info) [TAAC server](https://tacc.carlboettiger.info).
 
 ## Services
 
 - [Allie login](/allie/auth-sign-in)
 - [Allie session](/allie)
 
-- [Milad login](/milad/auth-sign-in)
-- [Milad session](/milad)
+- [Millie login](/millie/auth-sign-in)
+- [Millie session](/millie)
 
 - [Kari login](/kari/auth-sign-in)
 - [Kari session](/kari)
@@ -24,7 +24,7 @@ Welcome to the [Boettiger Lab](https://carlboettiger.info) [Chameleon server](ht
 
 ## Status
 
-- [Server Status](https://status.chameleon.carlboettiger.info)
+- [Server Status](https://status.tacc.carlboettiger.info)
 
 
 ## Specs
@@ -34,9 +34,8 @@ This is an 8-core, 16 GB ram virtual machine.
 ## Host
 
 This machine is being run out of [TACC](https://www.tacc.utexas.edu/) in Austin, Texas.
-through the [NSF XSEDE](https://www.xsede.org/)'s [Chameleon Cloud computing platform](https://chameleoncloud.org).  
+through the [NSF XSEDE](https://www.xsede.org/)'
 
 ## Openstack portal
 
-Authorized users can manage this and other Chameleon machines through their [OpenStack Portal](https://openstack.tacc.chameleoncloud.org/dashboard/auth/login/)
 
