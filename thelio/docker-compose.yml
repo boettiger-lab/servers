@@ -1,0 +1,47 @@
+version: '2'
+
+services:
+  caddy:
+    image: joshix/caddy
+   ## public files in site, .caddy holds letsencrypt certs
+    volumes:
+      - ./site/:/var/www/html
+      - ./.caddy/:/.caddy
+    ports:
+    # - 80:80
+      - 443:443
+    restart: always
+    command: "--agree=true"
+
+  rstudio:
+    image: rocker/gpu
+    restart: always
+    volumes:
+      - $HOME/projects:/home/rstudio/projects
+    env_file: ./private_env.sh
+
+#  monitor:
+#    image: titpetric/netdata
+#    restart: always
+#    cap_add:
+#      - SYS_PTRACE
+#    volumes:
+#      - /proc:/host/proc:ro
+#      - /sys:/host/sys:ro
+#      - ./netdata.conf:/etc/netdata/netdata.conf
+#    ports:
+#      - 19999:19999
+##
+## FIXME consider binding these to volume on /media/cboettig/ExtraDrive1
+#  mariadb:
+#      image: mariadb
+#      environment:
+#          - MYSQL_ROOT_PASSWORD=password
+#  postgres:
+#      image: postgres
+#      environment:
+#          - POSTGRES_PASSWORD=password
+
+
+
+

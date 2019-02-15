@@ -17,7 +17,7 @@ services:
     command: "--agree=true"
 
   rstudio:
-    image: cboettig/labnotebook
+    image: rocker/geospatial 
     restart: always
     volumes:
       - $HOME/projects:/home/rstudio/projects
