@@ -14,11 +14,16 @@ services:
     command: "--agree=true"
 
   rstudio:
-    image: rocker/gpu
+    image: rocker/ml-gpu
     restart: always
     volumes:
-      - $HOME/projects:/home/rstudio/projects
+      - ./addusers.sh:/etc/cont-init.d/addusers
+      - home:/home
+      - /media/cboettig/ExtraDrive1:/data
     env_file: ./private_env.sh
+
+volumes: 
+  home: 
 
 #  monitor:
 #    image: titpetric/netdata
