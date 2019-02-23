@@ -14,6 +14,7 @@ services:
     command: "--agree=true"
 
   rstudio:
+    runtime: nvidia
     image: rocker/ml-gpu
     restart: always
     volumes:
@@ -22,8 +23,8 @@ services:
       - /media/cboettig/ExtraDrive1:/data
     env_file: ./private_env.sh
 
-volumes: 
-  home: 
+volumes:
+  home:
 
 #  monitor:
 #    image: titpetric/netdata
