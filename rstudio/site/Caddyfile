@@ -1,4 +1,4 @@
-compute.carlboettiger.info {
+teaching.carlboettiger.info {
   
   tls cboettig@gmail.com
 
@@ -11,12 +11,12 @@ compute.carlboettiger.info {
 }
 
 
-status.compute.carlboettiger.info {
-
-  tls cboettig@gmail.com
-  proxy / monitor:19999 
-
-}
+#status.teaching.carlboettiger.info {
+#
+#  tls cboettig@gmail.com
+#  proxy / monitor:19999 
+#
+#}
 
 
 
