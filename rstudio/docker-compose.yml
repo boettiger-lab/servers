@@ -2,25 +2,24 @@ version: '2'
 
 services:
   caddy:
-    image: joshix/caddy
-    links:
-      - monitor
-      - rstudio
+    image: abiosoft/caddy
    ## public files in site, .caddy holds letsencrypt certs
     volumes:
-      - ./site/:/var/www/html
-      - ./.caddy/:/.caddy
+      - ./site/Caddyfile:/etc/Caddyfile
+      - ./.caddy/:/root/.caddy
     ports:
-      - 80:80
+    # - 80:80
       - 443:443
     restart: always
-    command: "--agree=true"
+    environment:
+      - ACME_AGREE=true
 
   rstudio:
     image: rocker/geospatial 
     restart: always
     volumes:
-      - $HOME/projects:/home/rstudio/projects
+      - $HOME/rstudio_users:/home/
+      - /vol_c:/home/shared
     env_file: ./private_env.sh
 
   monitor:
