@@ -8,7 +8,7 @@ services:
       - ./site/Caddyfile:/etc/Caddyfile
       - ./.caddy/:/root/.caddy
     ports:
-    # - 80:80
+      - 80:80
       - 443:443
     restart: always
     environment:

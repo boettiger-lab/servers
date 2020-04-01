@@ -1,4 +1,4 @@
-thelio.dyn.berkeley.edu {
+thelio.carlboettiger.info {
   
   tls cboettig@gmail.com
 
@@ -10,13 +10,33 @@ thelio.dyn.berkeley.edu {
 
 }
 
+data.carlboettiger.info {
+    
+    tls cboettig@gmail.com
+    root /www/data.carlboettiger.info
+    gzip
+    log ../access.log
 
-# status.compute.carlboettiger.info {
-#
-#  tls cboettig@gmail.com
-#  proxy / monitor:19999 
-#
-#}
+}
 
+thelio-status.carlboettiger.info {
+
+  tls cboettig@gmail.com
+  proxy / monitor:19999 
+
+}
+
+
+rstudio.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+
+  proxy / rstudio2:8787 {
+    header_upstream Host {host}
+    websocket
+    transparent
+  }
+
+}
 
 
