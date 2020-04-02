@@ -39,4 +39,33 @@ rstudio.carlboettiger.info {
 
 }
 
+# GitLab, based on: https://gitlab.com/gitlab-org/gitlab-recipes/-/blob/master/web-server/caddy/Caddyfile 
+
+gitlab.carlboettiger.info {
+    tls cboettig@gmail.com
+
+    log git.access.log {
+        rotate_size     50
+	    rotate_age      90
+	    rotate_keep     20
+	    rotate_compress
+    }
+
+    errors git.errors.log {
+        404 /opt/gitlab/embedded/service/gitlab-rails/public/404.html
+        422 /opt/gitlab/embedded/service/gitlab-rails/public/422.html
+        500 /opt/gitlab/embedded/service/gitlab-rails/public/500.html
+        502 /opt/gitlab/embedded/service/gitlab-rails/public/502.html
+    }
+
+    proxy / gitlab:8081 {
+        fail_timeout 0s
+
+        header_upstream X-Forwarded-Ssl on
+        
+        transparent
+    }
+}
+
+
 
