@@ -34,6 +34,8 @@ rstudio:
 	--env-file private_env.sh \
 	-v $(pwd)/addusers.sh:/etc/cont-init.d/addusers \
 	-v /var/rstudio/data:/home \
+    -v /zpool/content-store:/zpool/content-store \
+	-v /zpool/scratch:/zpool/scratch \
 	--restart always \
 	--gpus all \
 	--network thelio-net \
@@ -56,9 +58,9 @@ rstudio2:
 	docker run --name rstudio2 \
 	-d \
 	--env-file private_env.sh \
-	-v $(pwd)/addusers.sh:/etc/cont-init.d/addusers \
 	-v /var/rstudio/data:/home \
-    -v /zpool:/zpool \
+    -v /zpool/content-store:/zpool/content-store \
+	-v /zpool/scratch:/zpool/scratch \
 	--restart always \
 	--gpus all \
 	--network thelio-net \
