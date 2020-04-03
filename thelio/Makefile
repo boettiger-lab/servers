@@ -1,5 +1,7 @@
 .PHONY: network caddy rstudio rstudio2 monitor gitlab
+#HERE=$(pwd)
 
+HERE=/home/cboettig/Documents/servers/thelio
 
 network: 
 	docker network create -d bridge thelio-net
@@ -10,29 +12,32 @@ oldcaddy:
 	-d -p 0.0.0.0:443:443 \
 	--restart always \
 	-e ACME_AGREE=true \
-	-v $(pwd)/site/Caddyfile:/etc/Caddyfile \
-	-v $(pwd)/.caddy/:/root/caddy \
+	-v ${HERE}/site/Caddyfile:/etc/Caddyfile \
+	-v ${HERE}/.caddy/:/root/caddy \
     -v /zpool/content-store:/www/data.carlboettiger.info \
 	--network thelio-net \
 	abiosoft/caddy
 
+## Not quite working yet -- need kernel upgrade?
+## See: https://github.com/golang/go/wiki/LinuxKernelSignalVectorBug
 caddy: 
 	docker run --name caddy \
 	-d -p 0.0.0.0:80:80 \
 	-d -p 0.0.0.0:443:443 \
 	--restart always \
-	-v $(pwd)/site/Caddyfile:/etc/caddy/Caddyfile \
-	-v $(pwd)/.caddy/:/data \
-    -v /zpool/content-store:/usr/share/caddy/data.carlboettiger.info \
-	--network thelio-net \
+	-v ${HERE}/site/Caddyfile_v2:/etc/caddy/Caddyfile \
+	-v ${HERE}/.caddy/:/data \
+	-v /zpool/content-store:/www/data.carlboettiger.info \
+    --network thelio-net \
 	caddy/caddy
+
 
 
 rstudio:
 	docker run --name rstudio \
 	-d \
 	--env-file private_env.sh \
-	-v $(pwd)/addusers.sh:/etc/cont-init.d/addusers \
+	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
 	-v /var/rstudio/data:/home \
     -v /zpool/content-store:/zpool/content-store \
 	-v /zpool/scratch:/zpool/scratch \
@@ -49,7 +54,7 @@ monitor:
     -v /proc:/host/proc:ro \
     -v /sys:/host/sys:ro \
 	-v /var/run/docker.sock:/var/run/docker.sock:ro \
-	-v $(pwd)/netdata.conf:/etc/netdata/netdata.conf \
+	-v ${HERE}/netdata.conf:/etc/netdata/netdata.conf \
     --network thelio-net \
     netdata/netdata
 

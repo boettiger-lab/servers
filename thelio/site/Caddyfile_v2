@@ -1,0 +1,63 @@
+thelio.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+
+  reverse_proxy / rstudio:8787 {
+    header_up Host {host}
+  }
+
+}
+
+data.carlboettiger.info {
+    
+    tls cboettig@gmail.com
+    root * /www/data.carlboettiger.info
+    encode gzip
+    log {
+        output file    ../access.log
+    }
+
+}
+
+thelio-status.carlboettiger.info {
+
+  tls cboettig@gmail.com
+  reverse_proxy / monitor:19999 
+
+}
+
+
+rstudio.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+
+  reverse_proxy / rstudio2:8787 {
+    header_up Host {host}
+  }
+
+}
+
+# GitLab, based on: https://gitlab.com/gitlab-org/gitlab-recipes/-/blob/master/web-server/caddy/Caddyfile 
+
+gitlab.carlboettiger.info {
+    tls cboettig@gmail.com
+
+    log
+
+    handle_errors {
+        @404 /opt/gitlab/embedded/service/gitlab-rails/public/404.html
+        @422 /opt/gitlab/embedded/service/gitlab-rails/public/422.html
+        @500 /opt/gitlab/embedded/service/gitlab-rails/public/500.html
+        @502 /opt/gitlab/embedded/service/gitlab-rails/public/502.html
+    }
+
+    reverse_proxy / gitlab:8081 {
+        fail_timeout 0s
+
+        header_up X-Forwarded-Ssl on
+        
+    }
+}
+
+
+
