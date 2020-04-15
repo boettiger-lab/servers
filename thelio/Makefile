@@ -8,8 +8,9 @@ network:
 
 oldcaddy: 
 	docker run --name caddy \
-	-d -p 0.0.0.0:80:80 \
-	-d -p 0.0.0.0:443:443 \
+	--detach \
+	--publish 0.0.0.0:80:80 \
+	--publish 0.0.0.0:443:443 \
 	--restart always \
 	-e ACME_AGREE=true \
 	-v ${HERE}/site/Caddyfile:/etc/Caddyfile \
@@ -22,8 +23,9 @@ oldcaddy:
 ## See: https://github.com/golang/go/wiki/LinuxKernelSignalVectorBug
 caddy: 
 	docker run --name caddy \
-	-d -p 0.0.0.0:80:80 \
-	-d -p 0.0.0.0:443:443 \
+	--detach \
+	--publish 0.0.0.0:80:80 \
+	--publish 0.0.0.0:443:443 \
 	--restart always \
 	-v ${HERE}/site/Caddyfile_v2:/etc/caddy/Caddyfile \
 	-v ${HERE}/.caddy/:/data \
@@ -35,7 +37,7 @@ caddy:
 
 rstudio:
 	docker run --name rstudio \
-	-d \
+	--detach \
 	--env-file private_env.sh \
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
 	-v /var/rstudio/data:/home \
@@ -48,7 +50,7 @@ rstudio:
 
 monitor: 
 	docker run --name monitor \
-    -d \
+    --detach \
     --restart always \
     --cap-add SYS_PTRACE \
     -v /proc:/host/proc:ro \
@@ -61,7 +63,7 @@ monitor:
 
 rstudio2: 
 	docker run --name rstudio2 \
-	-d \
+	--detach \
 	--env-file private_env.sh \
 	-v /var/rstudio/data:/home \
     -v /zpool/content-store:/zpool/content-store \
@@ -83,4 +85,29 @@ gitlab:
     -v /zpool/gitlab/data:/var/opt/gitlab \
 	gitlab/gitlab-ce:latest
 
+ml:
+	docker run --name ml \
+	--detach \
+	--env-file private_env.sh \
+	--gpus all \
+	--network thelio-net \
+	rockerdev/ml:3.6.3-gpu
+
+
+minio: 
+	docker run --name minio \
+	  --detach \
+	  --env-file minio_env.sh \
+	  --network thelio-net \
+	  -v /zpool/content-store:/data \
+	  minio/minio server /data
+
+## minio client for making edits
+minio-mc:
+	docker run --name minio-mc \
+		--rm -t -i \
+		--network thelio-net \
+		-v ${HERE}/minio-mc-config.json:/root/.mc/config.json \
+		--entrypoint /bin/sh \
+		minio/mc
 

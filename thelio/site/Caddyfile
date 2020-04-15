@@ -10,6 +10,17 @@ thelio.carlboettiger.info {
 
 }
 
+minio.carlboettiger.info {
+
+    tls cboettig@gmail.com
+    proxy / minio:9000 {
+        transparent
+    }
+
+}
+
+
+## Caddy-based file server
 data.carlboettiger.info {
     
     tls cboettig@gmail.com
@@ -68,4 +79,28 @@ gitlab.carlboettiger.info {
 }
 
 
+ml.carlboettiger.info {
+
+  tls cboettig@gmail.com
+
+  proxy / ml:8787 {
+    header_upstream Host {host}
+    websocket
+    transparent
+  }
+
+}
+
+
+
+
+#
+#jupyter.carlboettiger.info {
+#  tls cboettig@gmail.com
+#  proxy / jupyter:8888 {
+#    websocket
+#    transparent
+#  }
+#}
+#
 
