@@ -1,0 +1,79 @@
+chameleon.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+
+  reverse_proxy rstudio:8787 {
+    header_up Host {host}
+  }
+
+}
+
+chameleon-status.carlboettiger.info {
+
+  tls cboettig@gmail.com
+  reverse_proxy monitor:19999 
+
+}
+
+
+minio.carlboettiger.info {
+
+    tls cboettig@gmail.com
+    reverse_proxy minio:9000 {
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-Host {host}
+        header_up Host {host}
+        health_path /minio/health/ready
+    }
+}
+
+data.carlboettiger.info {
+   
+   tls cboettig@gmail.com
+   rewrite * /content-store/{path}
+   reverse_proxy minio:9000
+}
+
+
+rstudio.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+
+  reverse_proxy rstudio2:8787 {
+    header_up Host {host}
+  }
+
+}
+
+## GitLab, based on: https://gitlab.com/gitlab-org/gitlab-recipes/-/blob/master/web-server/caddy/Caddyfile 
+#
+
+gitlab.carlboettiger.info {
+    tls cboettig@gmail.com
+
+#    log
+#
+#    handle_errors {
+#        @404 /opt/gitlab/embedded/service/gitlab-rails/public/404.html
+#        @422 /opt/gitlab/embedded/service/gitlab-rails/public/422.html
+#        @500 /opt/gitlab/embedded/service/gitlab-rails/public/500.html
+#        @502 /opt/gitlab/embedded/service/gitlab-rails/public/502.html
+#    }
+
+    reverse_proxy gitlab:8081 {
+        header_up X-Forwarded-Ssl on
+    }
+}
+
+
+#ml.carlboettiger.info {
+#  
+#  tls cboettig@gmail.com
+#
+#  reverse_proxy ml:8787 {
+#    header_up Host {host}
+#  }
+#
+#}
+
+
