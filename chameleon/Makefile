@@ -3,7 +3,7 @@ HERE=$(shell pwd)
 ZPOOL=/zpool
 
 network: 
-	docker network create -d bridge thelio-net
+	docker network create -d bridge chameleon-net
 
 caddy: 
 	docker run --name caddy \
@@ -13,7 +13,7 @@ caddy:
 	--restart always \
 	-v ${HERE}/site/Caddyfile_v2:/etc/caddy/Caddyfile \
 	-v ${HERE}/.caddy/:/data \
-	--network thelio-net \
+	--network chameleon-net \
 	caddy
 
 rstudio:
@@ -24,9 +24,8 @@ rstudio:
 	-v ${ZPOOL}/user-home:/home \
 	-v ${ZPOOL}/minio/content-store:/zpool/content-store \
 	--restart always \
-	--gpus all \
-	--network thelio-net \
-	rockerdev/ml:4.0.0-cuda-10.0
+	--network chameleon-net \
+	rocker/geospatial
 
 monitor: 
 	docker run --name monitor \
@@ -37,7 +36,7 @@ monitor:
 	-v /sys:/host/sys:ro \
 	-v /var/run/docker.sock:/var/run/docker.sock:ro \
 	-v ${HERE}/netdata.conf:/etc/netdata/netdata.conf \
-	--network thelio-net \
+	--network chameleon-net \
 	netdata/netdata
 
 
@@ -49,15 +48,14 @@ rstudio2:
  	-v ${ZPOOL}/user-home:/home \
 	-v ${ZPOOL}/minio/content-store:/zpool/content-store \
 	--restart always \
-	--gpus all \
-	--network thelio-net \
-	rocker/ml-verse
+	--network chameleon-net \
+	rocker/geospatial
 
 gitlab:
 	docker run --name gitlab \
 	--detach \
 	--restart always \
-	--network thelio-net \
+	--network chameleon-net \
 	--hostname gitlab.carlboettiger.info \
 	-e GITLAB_OMNIBUS_CONFIG="external_url 'http://gitlab.carlboettiger.info'; nginx['listen_port'] = 8081; gitlab_rails['lfs_embedded'] = true; gitlab_rails['gitlab_shell_ssh_port'] = 2224" \
 	-v /srv/gitlab/config:/etc/gitlab \
@@ -69,16 +67,19 @@ minio:
 	docker run --name minio \
 	  --detach \
 	  --restart always \
-	  --env-file minio_env.sh \
-	  --network thelio-net \
+	  --network chameleon-net \
 	  -v ${ZPOOL}:/data \
 	  minio/minio server /data
+
+#	  --env-file minio_env.sh \
+
+
 
 ## minio client for making edits
 minio-mc:
 	docker run --name minio-mc \
 		--rm -t -i \
-		--network thelio-net \
+		--network chameleon-net \
 		-v ${HERE}/minio-mc-config.json:/root/.mc/config.json \
 		--entrypoint /bin/sh \
 		minio/mc
