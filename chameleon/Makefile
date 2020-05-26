@@ -1,6 +1,6 @@
 .PHONY: network caddy rstudio rstudio2 monitor gitlab
 HERE=$(shell pwd)
-ZPOOL=/zpool
+ZPOOL=/zpool/user-home
 
 network: 
 	docker network create -d bridge chameleon-net
@@ -11,7 +11,7 @@ caddy:
 	--publish 0.0.0.0:80:80 \
 	--publish 0.0.0.0:443:443 \
 	--restart always \
-	-v ${HERE}/site/Caddyfile_v2:/etc/caddy/Caddyfile \
+	-v ${HERE}/Caddyfile:/etc/caddy/Caddyfile \
 	-v ${HERE}/.caddy/:/data \
 	--network chameleon-net \
 	caddy
@@ -21,8 +21,8 @@ rstudio:
 	--detach \
 	--env-file private_env.sh \
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
-	-v ${ZPOOL}/user-home:/home \
-	-v ${ZPOOL}/minio/content-store:/zpool/content-store \
+	-v ${ZPOOL}:/home \
+	-v ${ZPOOL}/content-store:/zpool/content-store \
 	--restart always \
 	--network chameleon-net \
 	rocker/geospatial
@@ -31,22 +31,31 @@ monitor:
 	docker run --name monitor \
 	--detach \
 	--restart always \
+        --security-opt apparmor=unconfined \
 	--cap-add SYS_PTRACE \
 	-v /proc:/host/proc:ro \
 	-v /sys:/host/sys:ro \
 	-v /var/run/docker.sock:/var/run/docker.sock:ro \
-	-v ${HERE}/netdata.conf:/etc/netdata/netdata.conf \
 	--network chameleon-net \
 	netdata/netdata
 
+
+hash-archive:
+	docker run --name hash-archive \
+		--detach \
+		--restart always \
+		-v hash-archive.db:/hash-archive/hash-archive.db \
+		--network chameleon-net \
+		-e URL=hash-archive.carlboettiger.info \
+		cboettig/hash-archive
 
 rstudio2: 
 	docker run --name rstudio2 \
 	--detach \
 	--env-file private_env.sh \
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
- 	-v ${ZPOOL}/user-home:/home \
-	-v ${ZPOOL}/minio/content-store:/zpool/content-store \
+ 	-v ${ZPOOL}:/home \
+	-v ${ZPOOL}/content-store:/zpool/content-store \
 	--restart always \
 	--network chameleon-net \
 	rocker/geospatial
@@ -67,11 +76,11 @@ minio:
 	docker run --name minio \
 	  --detach \
 	  --restart always \
+	  --env-file minio_env.sh \
 	  --network chameleon-net \
 	  -v ${ZPOOL}:/data \
 	  minio/minio server /data
 
-#	  --env-file minio_env.sh \
 
 
 
@@ -79,8 +88,9 @@ minio:
 minio-mc:
 	docker run --name minio-mc \
 		--rm -t -i \
-		--network chameleon-net \
 		-v ${HERE}/minio-mc-config.json:/root/.mc/config.json \
+		--network chameleon-net \
 		--entrypoint /bin/sh \
 		minio/mc
+
 
