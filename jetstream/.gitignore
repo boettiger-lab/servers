@@ -1,0 +1,5 @@
+addusers.sh
+minio_env.sh
+minio-mc-config.json
+private_env.sh
+

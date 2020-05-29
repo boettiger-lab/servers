@@ -1,0 +1,30 @@
+jetstream.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+
+  reverse_proxy rstudio:8787 {
+    header_up Host {host}
+  }
+
+}
+
+rstudio.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+  reverse_proxy rstudio:8787 {
+    header_up Host {host}
+  }
+}
+
+jetstream-status.carlboettiger.info {
+
+  tls cboettig@gmail.com
+  reverse_proxy monitor:19999 
+
+}
+
+
+minio-jetstream.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy minio:9000
+}
