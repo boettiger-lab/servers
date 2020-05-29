@@ -30,7 +30,7 @@ minio.carlboettiger.info {
 data.carlboettiger.info {
    
    tls cboettig@gmail.com
-   rewrite * /minio/content-store/{path}
+   rewrite * /content-store/{path}
    reverse_proxy minio:9000
 }
 
