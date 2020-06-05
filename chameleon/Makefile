@@ -22,7 +22,6 @@ rstudio:
 	--env-file private_env.sh \
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
 	-v ${ZPOOL}:/home \
-	-v ${ZPOOL}/content-store:/zpool/content-store \
 	--restart always \
 	--network chameleon-net \
 	rocker/geospatial
@@ -42,12 +41,12 @@ monitor:
 
 hash-archive:
 	docker run --name hash-archive \
-		--detach \
-		--restart always \
-		-v hash-archive.db:/hash-archive/hash-archive.db \
-		--network chameleon-net \
-		-e URL=hash-archive.carlboettiger.info \
-		cboettig/hash-archive
+	--detach \
+	--restart always \
+	-v ${ZPOOL}/content-store/hash-archive.db:/hash-archive/hash-archive.db \
+	--network chameleon-net \
+	-e URL=hash-archive.carlboettiger.info \
+	cboettig/hash-archive
 
 rstudio2: 
 	docker run --name rstudio2 \
@@ -55,7 +54,6 @@ rstudio2:
 	--env-file private_env.sh \
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
  	-v ${ZPOOL}:/home \
-	-v ${ZPOOL}/content-store:/zpool/content-store \
 	--restart always \
 	--network chameleon-net \
 	rocker/geospatial
