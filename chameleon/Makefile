@@ -22,7 +22,6 @@ rstudio:
 	--env-file private_env.sh \
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
 	-v ${ZPOOL}:/home \
-	-v ${ZPOOL}/content-store:/zpool/content-store \
 	--restart always \
 	--network chameleon-net \
 	rocker/geospatial
@@ -55,7 +54,6 @@ rstudio2:
 	--env-file private_env.sh \
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
  	-v ${ZPOOL}:/home \
-	-v ${ZPOOL}/content-store:/zpool/content-store \
 	--restart always \
 	--network chameleon-net \
 	rocker/geospatial
