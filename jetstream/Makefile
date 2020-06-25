@@ -53,7 +53,7 @@ hash-archive:
 	docker run --name hash-archive \
 		--detach \
 		--restart always \
-		-v ${ZPOOL}/content-store/hash-archive.db:/hash-archive/hash-archive.db \
+		-v ${ZPOOL}/hash-archive.db:/hash-archive/hash-archive.db \
 		--network jetstream-net \
 		-e URL=hash-archive.jetstream.carlboettiger.info \
 		cboettig/hash-archive
