@@ -24,7 +24,7 @@ rstudio:
 	-v ${ZPOOL}:/home \
 	--restart always \
 	--network chameleon-net \
-	rocker/geospatial:4.0.0
+	rocker/geospatial
 
 monitor: 
 	docker run --name monitor \
