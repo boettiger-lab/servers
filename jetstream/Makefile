@@ -1,6 +1,6 @@
 .PHONY: network caddy rstudio rstudio2 monitor gitlab
 HERE=$(shell pwd)
-ZPOOL=/scratch/user-home
+ZPOOL=/vol_c/user-home
 
 network: 
 	docker network create -d bridge jetstream-net
@@ -21,20 +21,11 @@ rstudio:
 	--detach \
 	--env-file private_env.sh \
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
-	-v ${ZPOOL}:/home \
+	-v /home/cboettig/users:/home \
 	--restart always \
 	--network jetstream-net \
-	rocker/geospatial:4.0.0
+	rocker/geospatial
 
-rstudio2:
-	docker run --name rstudio2 \
-	--detach \
-	--env-file private_env.sh \
-	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
-	-v ${ZPOOL}:/home \
-	--restart always \
-	--network jetstream-net \
-	rocker/geospatial:4.0.0
 
 
 monitor: 
