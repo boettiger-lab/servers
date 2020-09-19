@@ -8,6 +8,17 @@ thelio.carlboettiger.info {
 
 }
 
+tensorboard.thelio.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+
+  reverse_proxy rstudio:2223 {
+    header_up Host {host}
+  }
+
+}
+
+
 minio.thelio.carlboettiger.info {
 
     tls cboettig@gmail.com

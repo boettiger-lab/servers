@@ -60,14 +60,14 @@ rstudio2:
 
 gitlab:
 	docker run --name gitlab \
-	--detach \
+	-ti \
 	--network thelio-net \
 	--hostname gitlab.carlboettiger.info \
 	-e GITLAB_OMNIBUS_CONFIG="external_url 'http://gitlab.carlboettiger.info'; nginx['listen_port'] = 8081; gitlab_rails['lfs_embedded'] = true; gitlab_rails['gitlab_shell_ssh_port'] = 2224" \
-	-v /srv/gitlab/config:/etc/gitlab \
-	-v /srv/gitlab/logs:/var/log/gitlab \
-	-v /zpool/gitlab/data:/var/opt/gitlab \
-	gitlab/gitlab-ce:latest
+	-v /data/gitlab/config:/etc/gitlab \
+	-v /data/gitlab/logs:/var/log/gitlab \
+	-v /data/gitlab/data:/var/opt/gitlab \
+	gitlab/gitlab-ce:13.3.5-ce.0
 
 minio: 
 	docker run --name minio \
@@ -85,4 +85,23 @@ minio-mc:
 		-v ${HERE}/minio-mc-config.json:/root/.mc/config.json \
 		--entrypoint /bin/sh \
 		minio/mc
+
+mysql: 
+	docker run --name mariadb \
+		-d -e MYSQL_ROOT_PASSWORD=password \
+		--network thelio-net \
+		--restart always \
+		mariadb:10.5
+
+
+## NOTE: after launching container, you will need to do: 
+## docker exec -ti <container> bash
+## GITHUB_ACCESS_TOKEN=XXXX ./entrypoint.sh
+github-runner:
+	docker run -it --name my-runner \
+	  --name github-runner \
+	  --detach \
+	  --env-file github_runner.sh \
+	 rocker/safe-runner
+
 
