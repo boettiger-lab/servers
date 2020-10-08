@@ -52,9 +52,7 @@ rstudio2:
 	docker run --name rstudio2 \
 	--detach \
 	--env-file private_env.sh \
-	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
-	-v ${USER_HOME}:/home \
-        -v ${MINIO}:/minio \
+	-v ${HERE}/urap_users.sh:/etc/cont-init.d/addusers \
 	--network thelio-net \
 	rocker/ml-verse:4.0.2-cuda10.1
 
@@ -98,10 +96,52 @@ mysql:
 ## docker exec -ti <container> bash
 ## GITHUB_ACCESS_TOKEN=XXXX ./entrypoint.sh
 github-runner:
-	docker run -it --name my-runner \
+	docker run \
 	  --name github-runner \
 	  --detach \
-	  --env-file github_runner.sh \
+	  -e RUNNER_NAME=thelio1 \
+	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
+	 rocker/safe-runner
+
+github-runner2:
+	docker run \
+	  --name github-runner2 \
+	  --detach \
+	  -e RUNNER_NAME=thelio2 \
+	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
+	 rocker/safe-runner
+
+github-runner3:
+	docker run \
+	  --name github-runner3 \
+	  --detach \
+	  -e RUNNER_NAME=thelio3 \
+	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
+	 rocker/safe-runner
+
+github-runner4:
+	docker run \
+	  --name github-runner4 \
+	  --detach \
+	  -e RUNNER_NAME=thelio4 \
+	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
+	 rocker/safe-runner
+
+github-runner5:
+	docker run \
+	  --name github-runner5 \
+	  --detach \
+	  -e RUNNER_NAME=thelio5 \
+	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
+	 rocker/safe-runner
+
+
+github-runner6:
+	docker run \
+	  --name github-runner6 \
+	  --detach \
+	  -e RUNNER_NAME=thelio6 \
+	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
 	 rocker/safe-runner
 
 

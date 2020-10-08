@@ -3,4 +3,5 @@ minio_env.sh
 minio-mc-config.json
 private_env.sh
 github_runner.sh
+urap*
 
