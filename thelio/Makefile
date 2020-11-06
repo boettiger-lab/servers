@@ -1,7 +1,7 @@
 .PHONY: network caddy rstudio rstudio2 monitor gitlab
 HERE=$(shell pwd)
 MINIO=/zpool/minio
-USER_HOME=/var/rstudio/data
+USER_HOME=/opt/rstudio/home
 
 network: 
 	docker network create -d bridge thelio-net
@@ -24,9 +24,22 @@ rstudio:
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
 	-v ${USER_HOME}:/home \
         -v ${MINIO}:/minio \
+        --memory 45g \
 	--gpus all \
 	--network thelio-net \
-	rocker/ml-verse:4.0.2-cuda10.1
+	rocker/ml-verse:4.0.3-cuda10.1
+
+carl:
+	docker run --name carl \
+	--detach \
+	--env-file carl_private_env.sh \
+        -v /home/cboettig/Documents:/home/rstudio/Documents \
+        -v ${MINIO}:/minio \
+        --memory 45g \
+	--gpus all \
+	--network thelio-net \
+	rocker/ml-verse:4.0.3-cuda10.1
+
 
 monitor: 
 	docker run --name monitor \
@@ -52,9 +65,10 @@ rstudio2:
 	docker run --name rstudio2 \
 	--detach \
 	--env-file private_env.sh \
+        --memory 20g \
 	-v ${HERE}/urap_users.sh:/etc/cont-init.d/addusers \
 	--network thelio-net \
-	rocker/ml-verse:4.0.2-cuda10.1
+	rocker/ml-verse:4.0.3-cuda10.1
 
 gitlab:
 	docker run --name gitlab \
@@ -97,6 +111,7 @@ mysql:
 ## GITHUB_ACCESS_TOKEN=XXXX ./entrypoint.sh
 github-runner:
 	docker run \
+          --memory 10g \
 	  --name github-runner \
 	  --detach \
 	  -e RUNNER_NAME=thelio1 \
@@ -105,6 +120,7 @@ github-runner:
 
 github-runner2:
 	docker run \
+          --memory 10g \
 	  --name github-runner2 \
 	  --detach \
 	  -e RUNNER_NAME=thelio2 \
@@ -113,6 +129,7 @@ github-runner2:
 
 github-runner3:
 	docker run \
+          --memory 10g \
 	  --name github-runner3 \
 	  --detach \
 	  -e RUNNER_NAME=thelio3 \
@@ -121,6 +138,7 @@ github-runner3:
 
 github-runner4:
 	docker run \
+          --memory 10g \
 	  --name github-runner4 \
 	  --detach \
 	  -e RUNNER_NAME=thelio4 \
@@ -129,6 +147,7 @@ github-runner4:
 
 github-runner5:
 	docker run \
+          --memory 10g \
 	  --name github-runner5 \
 	  --detach \
 	  -e RUNNER_NAME=thelio5 \
@@ -138,6 +157,7 @@ github-runner5:
 
 github-runner6:
 	docker run \
+          --memory 10g \
 	  --name github-runner6 \
 	  --detach \
 	  -e RUNNER_NAME=thelio6 \

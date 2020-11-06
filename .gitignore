@@ -1,4 +1,4 @@
-private_env.sh
+*_env.sh
 access.log
 .caddy
 *.password
