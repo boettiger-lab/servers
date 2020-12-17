@@ -18,6 +18,17 @@ carl.carlboettiger.info {
 
 }
 
+cuda.thelio.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+
+  reverse_proxy cuda:8787 {
+    header_up Host {host}
+  }
+
+}
+
+
 tensorboard.thelio.carlboettiger.info {
   
   tls cboettig@gmail.com
