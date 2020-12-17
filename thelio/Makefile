@@ -108,10 +108,11 @@ mysql:
 
 ## NOTE: after launching container, you will need to do: 
 ## docker exec -ti <container> bash
-## GITHUB_ACCESS_TOKEN=XXXX ./entrypoint.sh
+##  ./entrypoint.sh XXXX
+## where XXXX is your GITHUB_ACCESS_TOKEN
 github-runner:
 	docker run \
-          --memory 10g \
+          --memory 5g \
 	  --name github-runner \
 	  --detach \
 	  -e RUNNER_NAME=thelio1 \
@@ -120,7 +121,7 @@ github-runner:
 
 github-runner2:
 	docker run \
-          --memory 10g \
+          --memory 5g \
 	  --name github-runner2 \
 	  --detach \
 	  -e RUNNER_NAME=thelio2 \
@@ -129,39 +130,24 @@ github-runner2:
 
 github-runner3:
 	docker run \
-          --memory 10g \
+          --memory 5g \
 	  --name github-runner3 \
 	  --detach \
 	  -e RUNNER_NAME=thelio3 \
 	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
 	 rocker/safe-runner
 
-github-runner4:
-	docker run \
-          --memory 10g \
-	  --name github-runner4 \
-	  --detach \
-	  -e RUNNER_NAME=thelio4 \
-	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
-	 rocker/safe-runner
 
-github-runner5:
-	docker run \
-          --memory 10g \
-	  --name github-runner5 \
-	  --detach \
-	  -e RUNNER_NAME=thelio5 \
-	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
-	 rocker/safe-runner
-
-
-github-runner6:
-	docker run \
-          --memory 10g \
-	  --name github-runner6 \
-	  --detach \
-	  -e RUNNER_NAME=thelio6 \
-	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
-	 rocker/safe-runner
+cuda:
+	docker run --name cuda \
+	--detach \
+	--env-file private_env.sh \
+	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
+	-v ${USER_HOME}:/home \
+        -v ${MINIO}:/minio \
+        --memory 25g \
+	--gpus all \
+	--network thelio-net \
+	rocker/ml-verse:4.0.3-cuda11.1
 
 
