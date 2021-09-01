@@ -68,5 +68,12 @@ minio.cirrus.carlboettiger.info {
     }
 }
 
+hash-archive.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+  reverse_proxy hash-archive:8000
+
+}
+
 
 
