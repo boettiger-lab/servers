@@ -18,7 +18,9 @@ caddy:
 	caddy
 
 rstudio:
-	docker run --name rstudio \
+	docker run \
+        --pull always \
+        --name rstudio \
 	--detach \
 	--restart always \
 	--env-file private_env.sh \
@@ -29,10 +31,11 @@ rstudio:
         --memory 200g \
 	--gpus all \
 	--network cirrus-net \
-	rocker/ml-verse:4.0.3-cuda10.1
+	rocker/ml-verse:4.1.0-cuda10.1
 
 cuda:
 	docker run --name cuda \
+        --pull always \
 	--detach \
 	--restart always \
 	--env-file private_env.sh \
@@ -48,6 +51,7 @@ cuda:
 
 rstudio2:
 	docker run --name rstudio2 \
+        --pull always \
 	--restart always \
 	--detach \
 	--env-file private_env.sh \
@@ -57,7 +61,8 @@ rstudio2:
         -v ${MINIO}:/minio \
         --memory 50g \
 	--network cirrus-net \
-	rocker/ml-verse:4.0.3-cuda10.1
+	--gpus 1 \
+	rocker/ml-verse:4.1.1-cuda10.1
 
 
 ## Get host PGID from: 
@@ -65,6 +70,7 @@ rstudio2:
 
 monitor:
 	docker run -d --name=monitor \
+        --pull always \
 	--restart always \
 	-p 19999:19999 \
 	-v /proc:/host/proc:ro \
@@ -80,11 +86,22 @@ monitor:
 
 minio: 
 	docker run --name minio \
+          --pull always \
 	  --restart always \
 	  --detach \
 	  --env-file minio_env.sh \
 	  --network cirrus-net \
 	  -v ${MINIO}:/data \
 	  minio/minio server /data
+
+
+hash-archive:
+	docker run --name hash-archive \
+	--detach \
+	--restart always \
+	-v ${MINIO}/hash-archive/hash-archive.db:/hash-archive/hash-archive.db \
+	--network cirrus-net \
+	-e URL=hash-archive.carlboettiger.info \
+	cboettig/hash-archive
 
 
