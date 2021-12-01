@@ -18,6 +18,17 @@ carl.carlboettiger.info {
 
 }
 
+vscode.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+
+  reverse_proxy vscode:8080 {
+    header_up Host {host}
+  }
+
+}
+
+
 cuda.thelio.carlboettiger.info {
   
   tls cboettig@gmail.com
@@ -33,7 +44,7 @@ tensorboard.thelio.carlboettiger.info {
   
   tls cboettig@gmail.com
 
-  reverse_proxy rstudio:2223 {
+  reverse_proxy cuda:2223 {
     header_up Host {host}
   }
 

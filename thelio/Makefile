@@ -2,9 +2,23 @@
 HERE=$(shell pwd)
 MINIO=/zpool/minio
 USER_HOME=/opt/rstudio/home
+URAP_HOME=/opt/urap
 
 network: 
 	docker network create -d bridge thelio-net
+
+vscode: 
+	docker run --name vscode \
+	--detach \
+	-v ${HOME}/vscode:/home/rocker \
+        -v ${MINIO}:/minio \
+	 --memory 35g \
+	--gpus all \
+	--network thelio-net \
+	-- rocker/vscode
+#	-v "${HOME}/.config:/home/rocker/.config" \
+#	-v "${HOME}/.local/share/code-server:/home/rocker/.local/share/code-server" \
+
 
 caddy: 
 	docker run --name caddy \
@@ -24,21 +38,23 @@ rstudio:
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
 	-v ${USER_HOME}:/home \
         -v ${MINIO}:/minio \
-        --memory 45g \
+	-v /var/log/tensorboard:/var/log/tensorboard \
+        --memory 35g \
 	--gpus all \
 	--network thelio-net \
-	rocker/ml-verse:4.0.3-cuda10.1
+	rocker/ml-verse:4.1.0-cuda10.1
 
 carl:
 	docker run --name carl \
 	--detach \
 	--env-file carl_private_env.sh \
-        -v /home/cboettig/Documents:/home/rstudio/Documents \
+        -v /media/carl:/home/rstudio/Documents \
         -v ${MINIO}:/minio \
-        --memory 45g \
+       	-v /var/log/tensorboard:/var/log/tensorboard \
+	--memory 45g \
 	--gpus all \
 	--network thelio-net \
-	rocker/ml-verse:4.0.3-cuda10.1
+	rocker/ml-verse:4.1.0-cuda10.1
 
 
 monitor: 
@@ -64,11 +80,16 @@ hash-archive:
 rstudio2: 
 	docker run --name rstudio2 \
 	--detach \
+	--gpus all \
 	--env-file private_env.sh \
-        --memory 20g \
+        --memory 15g \
+  	-v /var/log/tensorboard:/var/log/tensorboard \
+	-v ${URAP_HOME}:/home \
 	-v ${HERE}/urap_users.sh:/etc/cont-init.d/addusers \
+	-v /zpool/minio/shared-data:/minio/shared-data:ro \
+	-v /zpool/minio/neonstore:/minio/neonstore:ro \
 	--network thelio-net \
-	rocker/ml-verse:4.0.3-cuda10.1
+	rocker/ml-verse:4.1.1-cuda11.1
 
 gitlab:
 	docker run --name gitlab \
@@ -103,7 +124,7 @@ mysql:
 		-d -e MYSQL_ROOT_PASSWORD=password \
 		--network thelio-net \
 		--restart always \
-		mariadb:10.5
+		mariadb:latest
 
 
 ## NOTE: after launching container, you will need to do: 
@@ -112,6 +133,7 @@ mysql:
 ## where XXXX is your GITHUB_ACCESS_TOKEN
 github-runner:
 	docker run \
+          --restart always \
           --memory 5g \
 	  --name github-runner \
 	  --detach \
@@ -121,6 +143,7 @@ github-runner:
 
 github-runner2:
 	docker run \
+          --restart always \
           --memory 5g \
 	  --name github-runner2 \
 	  --detach \
@@ -130,6 +153,7 @@ github-runner2:
 
 github-runner3:
 	docker run \
+          --restart always \
           --memory 5g \
 	  --name github-runner3 \
 	  --detach \
@@ -145,9 +169,10 @@ cuda:
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
 	-v ${USER_HOME}:/home \
         -v ${MINIO}:/minio \
+ 	-v /var/log/tensorboard:/var/log/tensorboard \
         --memory 25g \
 	--gpus all \
 	--network thelio-net \
-	rocker/ml-verse:4.0.3-cuda11.1
+	rocker/ml-verse:4.1.0-cuda11.1
 
 
