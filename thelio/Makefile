@@ -1,23 +1,10 @@
 .PHONY: network caddy rstudio rstudio2 monitor gitlab
 HERE=$(shell pwd)
-MINIO=/zpool/minio
 USER_HOME=/opt/rstudio/home
 URAP_HOME=/opt/urap
 
 network: 
 	docker network create -d bridge thelio-net
-
-vscode: 
-	docker run --name vscode \
-	--detach \
-	-v ${HOME}/vscode:/home/rocker \
-        -v ${MINIO}:/minio \
-	 --memory 35g \
-	--gpus all \
-	--network thelio-net \
-	-- rocker/vscode
-#	-v "${HOME}/.config:/home/rocker/.config" \
-#	-v "${HOME}/.local/share/code-server:/home/rocker/.local/share/code-server" \
 
 
 caddy: 
@@ -34,27 +21,16 @@ caddy:
 rstudio:
 	docker run --name rstudio \
 	--detach \
+    --restart always \
 	--env-file private_env.sh \
+	-p 0.0.0.0:2220:22 \
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
 	-v ${USER_HOME}:/home \
-        -v ${MINIO}:/minio \
 	-v /var/log/tensorboard:/var/log/tensorboard \
-        --memory 35g \
-	--gpus all \
+    --memory 35g \
 	--network thelio-net \
-	rocker/ml-verse:4.1.0-cuda10.1
-
-carl:
-	docker run --name carl \
-	--detach \
-	--env-file carl_private_env.sh \
-        -v /media/carl:/home/rstudio/Documents \
-        -v ${MINIO}:/minio \
-       	-v /var/log/tensorboard:/var/log/tensorboard \
-	--memory 45g \
 	--gpus all \
-	--network thelio-net \
-	rocker/ml-verse:4.1.0-cuda10.1
+	rocker/ml-verse:4.1.2-cuda10.1
 
 
 monitor: 
@@ -72,7 +48,7 @@ monitor:
 hash-archive:
 	docker run --name hash-archive \
 	--detach \
-	-v /zpool/hash-archive.db:/hash-archive/hash-archive.db \
+	-v ${USER_HOME}/hash-archive.db:/hash-archive/hash-archive.db \
 	--network thelio-net \
 	-e URL=hash-archive.thelio.carlboettiger.info \
 	cboettig/hash-archive
@@ -80,17 +56,94 @@ hash-archive:
 rstudio2: 
 	docker run --name rstudio2 \
 	--detach \
-	--gpus all \
+	--restart always \
 	--env-file private_env.sh \
-        --memory 15g \
+    --memory 15g \
   	-v /var/log/tensorboard:/var/log/tensorboard \
 	-v ${URAP_HOME}:/home \
 	-v ${HERE}/urap_users.sh:/etc/cont-init.d/addusers \
-	-v /zpool/minio/shared-data:/minio/shared-data:ro \
-	-v /zpool/minio/neonstore:/minio/neonstore:ro \
+	--gpus all \
 	--network thelio-net \
-	rocker/ml-verse:4.1.1-cuda11.1
+	rocker/ml-verse:4.1.2-cuda11.1
 
+minio: 
+	docker run --name minio \
+	  --detach \
+      --restart always \
+	  --env-file minio_env.sh \
+	  --network thelio-net \
+      -v /mnt/disk1:/data1 \
+      -v /mnt/disk2:/data2 \
+      -v /mnt/disk3:/data3 \
+      -v /mnt/disk4:/data4 \
+      quay.io/minio/minio server /data{1...4} --console-address ":9001"	  
+
+prometheus:
+	docker run \
+      --detach \
+      --restart always \
+	  --network thelio-net \
+      -v ${HERE}/prometheus.yml:/etc/prometheus/prometheus.yml \
+      prom/prometheus
+
+
+## NOTE: after launching container, you will need to do: 
+## docker exec -ti <container> bash
+##  ./entrypoint.sh XXXX
+## where XXXX is your GITHUB_ACCESS_TOKEN
+github-runner:
+	docker run \
+      --restart always \
+      --memory 5g \
+	  --name github-runner \
+	  --detach \
+	  -e RUNNER_NAME=thelio1 \
+	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
+	  rocker/safe-runner
+
+github-runner2:
+	docker run \
+      --restart always \
+      --memory 5g \
+	  --name github-runner2 \
+	  --detach \
+	  -e RUNNER_NAME=thelio2 \
+	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
+	  rocker/safe-runner
+
+github-runner3:
+	docker run \
+      --restart always \
+      --memory 5g \
+	  --name github-runner3 \
+	  --detach \
+	  -e RUNNER_NAME=thelio3 \
+	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
+	  rocker/safe-runner
+
+
+vscode: 
+	docker run --name vscode \
+	--detach \
+	--restart always \
+	-v ${HOME}/vscode:/home/rocker \
+	 --memory 35g \
+	--network thelio-net \
+	-- rocker/vscode
+#	-v "${HOME}/.config:/home/rocker/.config" \
+#	-v "${HOME}/.local/share/code-server:/home/rocker/.local/share/code-server" \
+
+
+## occassional use, internal only
+mysql: 
+	docker run --name mariadb \
+		-d -e MYSQL_ROOT_PASSWORD=password \
+		--network thelio-net \
+		--restart always \
+		mariadb:latest
+
+
+## not currently active
 gitlab:
 	docker run --name gitlab \
 	-ti \
@@ -101,78 +154,5 @@ gitlab:
 	-v /data/gitlab/logs:/var/log/gitlab \
 	-v /data/gitlab/data:/var/opt/gitlab \
 	gitlab/gitlab-ce:13.3.5-ce.0
-
-minio: 
-	docker run --name minio \
-	  --detach \
-	  --env-file minio_env.sh \
-	  --network thelio-net \
-	  -v ${MINIO}:/data \
-	  minio/minio server /data
-
-## minio client for making edits
-minio-mc:
-	docker run --name minio-mc \
-		--rm -t -i \
-		--network thelio-net \
-		-v ${HERE}/minio-mc-config.json:/root/.mc/config.json \
-		--entrypoint /bin/sh \
-		minio/mc
-
-mysql: 
-	docker run --name mariadb \
-		-d -e MYSQL_ROOT_PASSWORD=password \
-		--network thelio-net \
-		--restart always \
-		mariadb:latest
-
-
-## NOTE: after launching container, you will need to do: 
-## docker exec -ti <container> bash
-##  ./entrypoint.sh XXXX
-## where XXXX is your GITHUB_ACCESS_TOKEN
-github-runner:
-	docker run \
-          --restart always \
-          --memory 5g \
-	  --name github-runner \
-	  --detach \
-	  -e RUNNER_NAME=thelio1 \
-	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
-	 rocker/safe-runner
-
-github-runner2:
-	docker run \
-          --restart always \
-          --memory 5g \
-	  --name github-runner2 \
-	  --detach \
-	  -e RUNNER_NAME=thelio2 \
-	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
-	 rocker/safe-runner
-
-github-runner3:
-	docker run \
-          --restart always \
-          --memory 5g \
-	  --name github-runner3 \
-	  --detach \
-	  -e RUNNER_NAME=thelio3 \
-	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
-	 rocker/safe-runner
-
-
-cuda:
-	docker run --name cuda \
-	--detach \
-	--env-file private_env.sh \
-	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
-	-v ${USER_HOME}:/home \
-        -v ${MINIO}:/minio \
- 	-v /var/log/tensorboard:/var/log/tensorboard \
-        --memory 25g \
-	--gpus all \
-	--network thelio-net \
-	rocker/ml-verse:4.1.0-cuda11.1
 
 

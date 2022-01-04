@@ -1,58 +1,22 @@
-thelio.carlboettiger.info {
-  
+thelio.carlboettiger.info {  
   tls cboettig@gmail.com
-
   reverse_proxy rstudio:8787 {
     header_up Host {host}
   }
-
-}
-
-carl.carlboettiger.info {
-  
-  tls cboettig@gmail.com
-
-  reverse_proxy carl:8787 {
-    header_up Host {host}
-  }
-
-}
-
-vscode.carlboettiger.info {
-  
-  tls cboettig@gmail.com
-
-  reverse_proxy vscode:8080 {
-    header_up Host {host}
-  }
-
 }
 
 
-cuda.thelio.carlboettiger.info {
-  
-  tls cboettig@gmail.com
-
-  reverse_proxy cuda:8787 {
-    header_up Host {host}
-  }
-
+data.thelio.carlboettiger.info {
+    tls cboettig@gmail.com
+    reverse_proxy minio:9001 {
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-Host {host}
+        header_up Host {host}
+        health_path /minio/health/ready
+    }
 }
-
-
-tensorboard.thelio.carlboettiger.info {
-  
-  tls cboettig@gmail.com
-
-  reverse_proxy cuda:2223 {
-    header_up Host {host}
-  }
-
-}
-
 
 minio.thelio.carlboettiger.info {
-
     tls cboettig@gmail.com
     reverse_proxy minio:9000 {
         header_up X-Forwarded-Proto {scheme}
@@ -62,45 +26,41 @@ minio.thelio.carlboettiger.info {
     }
 }
 
+
 hash-archive.thelio.carlboettiger.info {
-  
   tls cboettig@gmail.com
   reverse_proxy hash-archive:8000
-
 }
-
-
-
 
 status.thelio.carlboettiger.info {
-
   tls cboettig@gmail.com
   reverse_proxy monitor:19999 
-
 }
 
-
 rstudio.thelio.carlboettiger.info {
-  
   tls cboettig@gmail.com
   reverse_proxy rstudio2:8787 {
     header_up Host {host}
   }
-
 }
 
+vscode.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy vscode:8080 {
+    header_up Host {host}
+  }
+}
+
+
+tensorboard.thelio.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy rstudio:2223 {
+    header_up Host {host}
+  }
+}
 ## GitLab, based on: https://gitlab.com/gitlab-org/gitlab-recipes/-/blob/master/web-server/caddy/Caddyfile 
 gitlab.carlboettiger.info {
     tls cboettig@gmail.com
-
-#    log
-#    handle_errors {
-#        @404 /opt/gitlab/embedded/service/gitlab-rails/public/404.html
-#        @422 /opt/gitlab/embedded/service/gitlab-rails/public/422.html
-#        @500 /opt/gitlab/embedded/service/gitlab-rails/public/500.html
-#        @502 /opt/gitlab/embedded/service/gitlab-rails/public/502.html
-#    }
-
     reverse_proxy gitlab:8081 {
         header_up X-Forwarded-Ssl on
     }
