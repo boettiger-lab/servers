@@ -26,6 +26,11 @@ minio.thelio.carlboettiger.info {
     }
 }
 
+prometheus.thelio.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy prometheus:9090
+}
+
 
 hash-archive.thelio.carlboettiger.info {
   tls cboettig@gmail.com
