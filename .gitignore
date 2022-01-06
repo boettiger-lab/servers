@@ -4,3 +4,8 @@ access.log
 *.password
 .circle_token
 crontab
+prometheus.yml
+*.crt
+*.cert
+*.key
+

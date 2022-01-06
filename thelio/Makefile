@@ -72,6 +72,7 @@ minio:
       --restart always \
 	  --env-file minio_env.sh \
 	  --network thelio-net \
+	  -v ${HERE}/certs:/certs \
       -v /mnt/disk1:/data1 \
       -v /mnt/disk2:/data2 \
       -v /mnt/disk3:/data3 \
@@ -80,12 +81,24 @@ minio:
 
 prometheus:
 	docker run \
+	  --name prometheus \
       --detach \
       --restart always \
 	  --network thelio-net \
       -v ${HERE}/prometheus.yml:/etc/prometheus/prometheus.yml \
       prom/prometheus
 
+kes:
+	docker run \
+	  --name kes \
+	  --detach \
+	  --network thelio-net \
+	  -p 127.0.0.1:7373:7373 \
+	  -v ${HERE}/certs:/certs \
+	  -v ${HERE}/keys:/keys \
+	  -v ${HERE}/server-config.yml:/data/server-config.yml \
+	  -e MINIO_IDENTITY=f99b305aa6316fe2d89dec2056fa645e0fb808d9cd229816d0471e829cdcfc93 \
+	  minio/kes:v0.17.2 server --config=/data/server-config.yml --auth=off
 
 ## NOTE: after launching container, you will need to do: 
 ## docker exec -ti <container> bash
