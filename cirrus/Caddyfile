@@ -25,25 +25,15 @@ rstudio.cirrus.carlboettiger.info {
   }
 }
 
-cuda.cirrus.carlboettiger.info {
+vscode.cirrus.carlboettiger.info {
   
   tls cboettig@gmail.com
 
-  reverse_proxy cuda:8787 {
+  reverse_proxy vscode:8080 {
     header_up Host {host}
   }
+
 }
-
-
-jupyter.cirrus.carlboettiger.info {
-  
-  tls cboettig@gmail.com
-
-  reverse_proxy rstudio2:8888 {
-    header_up Host {host}
-  }
-}
-
 
 
 tensorboard.cirrus.carlboettiger.info {
@@ -56,6 +46,15 @@ tensorboard.cirrus.carlboettiger.info {
 
 }
 
+data.cirrus.carlboettiger.info {
+    tls cboettig@gmail.com
+    reverse_proxy minio:9001 {
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-Host {host}
+        header_up Host {host}
+        health_path /minio/health/ready
+    }
+}
 
 minio.cirrus.carlboettiger.info {
 
@@ -68,11 +67,14 @@ minio.cirrus.carlboettiger.info {
     }
 }
 
+prometheus.cirrus.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy prometheus:9090
+}
+
 hash-archive.carlboettiger.info {
-  
   tls cboettig@gmail.com
   reverse_proxy hash-archive:8000
-
 }
 
 
