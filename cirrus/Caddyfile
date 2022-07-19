@@ -16,6 +16,17 @@ cirrus.carlboettiger.info {
 
 }
 
+marcus.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+
+  reverse_proxy marcus:8787 {
+    header_up Host {host}
+  }
+
+}
+
+
 rstudio.cirrus.carlboettiger.info {
   
   tls cboettig@gmail.com
@@ -25,37 +36,40 @@ rstudio.cirrus.carlboettiger.info {
   }
 }
 
-cuda.cirrus.carlboettiger.info {
+vscode.cirrus.carlboettiger.info {
   
   tls cboettig@gmail.com
 
-  reverse_proxy cuda:8787 {
+  reverse_proxy vscode:8080 {
+    header_up Host {host}
+  }
+
+}
+
+tensorboard.cirrus.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy rstudio:2223 {
     header_up Host {host}
   }
 }
 
 
 jupyter.cirrus.carlboettiger.info {
-  
   tls cboettig@gmail.com
-
-  reverse_proxy rstudio2:8888 {
+  reverse_proxy rstudio2:8000 {
     header_up Host {host}
   }
 }
 
-
-
-tensorboard.cirrus.carlboettiger.info {
-  
-  tls cboettig@gmail.com
-
-  reverse_proxy rstudio:2223 {
-    header_up Host {host}
-  }
-
+data.cirrus.carlboettiger.info {
+    tls cboettig@gmail.com
+    reverse_proxy minio:9001 {
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-Host {host}
+        header_up Host {host}
+        health_path /minio/health/ready
+    }
 }
-
 
 minio.cirrus.carlboettiger.info {
 
@@ -68,11 +82,35 @@ minio.cirrus.carlboettiger.info {
     }
 }
 
+prometheus.cirrus.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy prometheus:9090
+}
+
+minio.carlboettiger.info {
+    tls cboettig@gmail.com
+    reverse_proxy minio_nvme:9000 {
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-Host {host}
+        header_up Host {host}
+        health_path /minio/health/ready
+    }
+}
+
+data.carlboettiger.info {
+    tls cboettig@gmail.com
+    reverse_proxy minio_nvme:9001 {
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-Host {host}
+        header_up Host {host}
+        health_path /minio/health/ready
+    }
+}
+
+
 hash-archive.carlboettiger.info {
-  
   tls cboettig@gmail.com
   reverse_proxy hash-archive:8000
-
 }
 
 
