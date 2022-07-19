@@ -5,6 +5,23 @@ thelio.carlboettiger.info {
   }
 }
 
+#shiny.thelio.carlboettiger.info {  
+#  tls cboettig@gmail.com
+#  reverse_proxy rstudio2:3838 {
+#    header_up Host {host}
+#  }
+#}
+
+
+js2.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy https://js2.jetstream-cloud.org:8001 {
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-Host {host}
+        header_up Host {host}
+  }
+ 
+}
 
 data.thelio.carlboettiger.info {
     tls cboettig@gmail.com
@@ -15,6 +32,8 @@ data.thelio.carlboettiger.info {
         health_path /minio/health/ready
     }
 }
+
+
 
 minio.thelio.carlboettiger.info {
     tls cboettig@gmail.com
@@ -49,12 +68,19 @@ rstudio.thelio.carlboettiger.info {
   }
 }
 
-vscode.carlboettiger.info {
-  tls cboettig@gmail.com
-  reverse_proxy vscode:8080 {
-    header_up Host {host}
-  }
-}
+#jupyter.thelio.carlboettiger.info {
+#  tls cboettig@gmail.com
+#  reverse_proxy rstudio:8888 {
+#    header_up Host {host}
+#  }
+#}
+
+#vscode.carlboettiger.info {
+#  tls cboettig@gmail.com
+#  reverse_proxy vscode:8080 {
+#    header_up Host {host}
+#  }
+#}
 
 
 tensorboard.thelio.carlboettiger.info {
@@ -63,12 +89,16 @@ tensorboard.thelio.carlboettiger.info {
     header_up Host {host}
   }
 }
+
+
 ## GitLab, based on: https://gitlab.com/gitlab-org/gitlab-recipes/-/blob/master/web-server/caddy/Caddyfile 
-gitlab.carlboettiger.info {
-    tls cboettig@gmail.com
-    reverse_proxy gitlab:8081 {
-        header_up X-Forwarded-Ssl on
-    }
-}
+#gitlab.carlboettiger.info {
+#    tls cboettig@gmail.com
+#    reverse_proxy gitlab:8081 {
+#        header_up X-Forwarded-Ssl on
+#    }
+#}
+#
+
 
 
