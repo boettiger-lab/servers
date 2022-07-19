@@ -21,21 +21,24 @@ caddy:
 rstudio:
 	docker run --name rstudio \
 	--detach \
-    --restart always \
+	--pull always \
+        --restart always \
 	--env-file private_env.sh \
 	-p 0.0.0.0:2220:22 \
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
 	-v ${USER_HOME}:/home \
 	-v /var/log/tensorboard:/var/log/tensorboard \
-    --memory 35g \
+	--shm-size=20gb \
+        --memory 35g \
 	--network thelio-net \
 	--gpus all \
-	rocker/ml-verse:4.1.2-cuda10.1
-
+	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
+	rocker/ml-verse:4.2.1-cuda11.1
 
 monitor: 
 	docker run --name monitor \
 	--detach \
+	--pull always \
 	--restart always \
 	--cap-add SYS_PTRACE \
 	-v /proc:/host/proc:ro \
@@ -53,40 +56,44 @@ hash-archive:
 	-e URL=hash-archive.thelio.carlboettiger.info \
 	cboettig/hash-archive
 
+urap: 
+	docker volume create urap 
+
 rstudio2: 
 	docker run --name rstudio2 \
 	--detach \
+	--pull always \
 	--restart always \
 	--env-file private_env.sh \
-    --memory 15g \
+	--memory 15g \
   	-v /var/log/tensorboard:/var/log/tensorboard \
-	-v ${URAP_HOME}:/home \
+	-v urap:/home \
 	-v ${HERE}/urap_users.sh:/etc/cont-init.d/addusers \
-	--gpus all \
 	--network thelio-net \
-	rocker/ml-verse:4.1.2-cuda11.1
+	--gpus all \
+	rocker/ml-verse:4.2.0-cuda11.1
 
 minio: 
 	docker run --name minio \
-	  --detach \
-      --restart always \
-	  --env-file minio_env.sh \
-	  --network thelio-net \
-	  -v ${HERE}/certs:/certs \
-      -v /mnt/disk1:/data1 \
-      -v /mnt/disk2:/data2 \
-      -v /mnt/disk3:/data3 \
-      -v /mnt/disk4:/data4 \
-      quay.io/minio/minio server /data{1...4} --console-address ":9001"	  
+	--detach \
+	--restart always \
+	--env-file minio_env.sh \
+	--network thelio-net \
+	-v ${HERE}/certs:/certs \
+	-v /mnt/disk1:/data1 \
+	-v /mnt/disk2:/data2 \
+	-v /mnt/disk3:/data3 \
+	-v /mnt/disk4:/data4 \
+	quay.io/minio/minio server /data{1...4} --console-address ":9001"	  
 
 prometheus:
 	docker run \
-	  --name prometheus \
-      --detach \
-      --restart always \
-	  --network thelio-net \
-      -v ${HERE}/prometheus.yml:/etc/prometheus/prometheus.yml \
-      prom/prometheus
+	--name prometheus \
+	--detach \
+	--restart always \
+	--network thelio-net \
+	-v ${HERE}/prometheus.yml:/etc/prometheus/prometheus.yml \
+	prom/prometheus
 
 kes:
 	docker run \
@@ -121,7 +128,7 @@ github-runner2:
 	  --name github-runner2 \
 	  --detach \
 	  -e RUNNER_NAME=thelio2 \
-	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
+	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-288 \
 	  rocker/safe-runner
 
 github-runner3:
@@ -131,7 +138,7 @@ github-runner3:
 	  --name github-runner3 \
 	  --detach \
 	  -e RUNNER_NAME=thelio3 \
-	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
+	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-288 \
 	  rocker/safe-runner
 
 
