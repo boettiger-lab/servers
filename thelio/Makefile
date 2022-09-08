@@ -4,7 +4,7 @@ USER_HOME=/opt/rstudio/home
 URAP_HOME=/opt/urap
 
 network: 
-	docker network create -d bridge thelio-net
+	docker network create -d bridge minikube
 
 
 caddy: 
@@ -15,7 +15,7 @@ caddy:
 	--restart always \
 	-v ${HERE}/Caddyfile:/etc/caddy/Caddyfile \
 	-v ${HERE}/.caddy/:/data \
-	--network thelio-net \
+	--network minikube \
 	caddy
 
 rstudio:
@@ -30,7 +30,7 @@ rstudio:
 	-v /var/log/tensorboard:/var/log/tensorboard \
 	--shm-size=20gb \
         --memory 35g \
-	--network thelio-net \
+	--network minikube \
 	--gpus all \
 	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
 	rocker/ml-verse:4.2.1-cuda11.1
@@ -45,14 +45,14 @@ monitor:
 	-v /sys:/host/sys:ro \
 	-v /var/run/docker.sock:/var/run/docker.sock:ro \
 	-v ${HERE}/netdata.conf:/etc/netdata/netdata.conf \
-	--network thelio-net \
+	--network minikube \
 	netdata/netdata
 
 hash-archive:
 	docker run --name hash-archive \
 	--detach \
 	-v ${USER_HOME}/hash-archive.db:/hash-archive/hash-archive.db \
-	--network thelio-net \
+	--network minikube \
 	-e URL=hash-archive.thelio.carlboettiger.info \
 	cboettig/hash-archive
 
@@ -69,7 +69,8 @@ rstudio2:
   	-v /var/log/tensorboard:/var/log/tensorboard \
 	-v urap:/home \
 	-v ${HERE}/urap_users.sh:/etc/cont-init.d/addusers \
-	--network thelio-net \
+	--network minikube \
+	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
 	--gpus all \
 	rocker/ml-verse:4.2.0-cuda11.1
 
@@ -78,7 +79,7 @@ minio:
 	--detach \
 	--restart always \
 	--env-file minio_env.sh \
-	--network thelio-net \
+	--network minikube \
 	-v /mnt/disk1:/data1 \
 	-v /mnt/disk2:/data2 \
 	-v /mnt/disk3:/data3 \
@@ -90,7 +91,7 @@ prometheus:
 	--name prometheus \
 	--detach \
 	--restart always \
-	--network thelio-net \
+	--network minikube \
 	-v ${HERE}/prometheus.yml:/etc/prometheus/prometheus.yml \
 	prom/prometheus
 
@@ -98,7 +99,7 @@ prometheus:
 #	docker run \
 #	  --name kes \
 #	  --detach \
-#	  --network thelio-net \
+#	  --network minikube \
 #	  -p 127.0.0.1:7373:7373 \
 #	  -v ${HERE}/certs:/certs \
 #	  -v ${HERE}/keys:/keys \
@@ -110,6 +111,9 @@ prometheus:
 ## docker exec -ti <container> bash
 ##  ./entrypoint.sh XXXX
 ## where XXXX is your GITHUB_ACCESS_TOKEN
+## 
+## THEN RESTART the docker container to take effect!
+## You will need to make a github access token with sufficient scopes.
 github-runner:
 	docker run \
       --restart always \
@@ -127,7 +131,7 @@ github-runner2:
 	  --name github-runner2 \
 	  --detach \
 	  -e RUNNER_NAME=thelio2 \
-	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-288 \
+	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
 	  rocker/safe-runner
 
 github-runner3:
@@ -137,7 +141,7 @@ github-runner3:
 	  --name github-runner3 \
 	  --detach \
 	  -e RUNNER_NAME=thelio3 \
-	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-288 \
+	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
 	  rocker/safe-runner
 
 
@@ -147,7 +151,7 @@ vscode:
 	--restart always \
 	-v ${HOME}/vscode:/home/rocker \
 	 --memory 35g \
-	--network thelio-net \
+	--network minikube \
 	-- rocker/vscode
 #	-v "${HOME}/.config:/home/rocker/.config" \
 #	-v "${HOME}/.local/share/code-server:/home/rocker/.local/share/code-server" \
@@ -157,7 +161,7 @@ vscode:
 mysql: 
 	docker run --name mariadb \
 		-d -e MYSQL_ROOT_PASSWORD=password \
-		--network thelio-net \
+		--network minikube \
 		--restart always \
 		mariadb:latest
 
@@ -166,7 +170,7 @@ mysql:
 gitlab:
 	docker run --name gitlab \
 	-ti \
-	--network thelio-net \
+	--network minikube \
 	--hostname gitlab.carlboettiger.info \
 	-e GITLAB_OMNIBUS_CONFIG="external_url 'http://gitlab.carlboettiger.info'; nginx['listen_port'] = 8081; gitlab_rails['lfs_embedded'] = true; gitlab_rails['gitlab_shell_ssh_port'] = 2224" \
 	-v /data/gitlab/config:/etc/gitlab \

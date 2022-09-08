@@ -13,16 +13,6 @@ thelio.carlboettiger.info {
 #}
 
 
-js2.carlboettiger.info {
-  tls cboettig@gmail.com
-  reverse_proxy https://js2.jetstream-cloud.org:8001 {
-        header_up X-Forwarded-Proto {scheme}
-        header_up X-Forwarded-Host {host}
-        header_up Host {host}
-  }
- 
-}
-
 data.thelio.carlboettiger.info {
     tls cboettig@gmail.com
     reverse_proxy minio:9001 {
@@ -32,7 +22,6 @@ data.thelio.carlboettiger.info {
         health_path /minio/health/ready
     }
 }
-
 
 
 minio.thelio.carlboettiger.info {
@@ -45,16 +34,16 @@ minio.thelio.carlboettiger.info {
     }
 }
 
-prometheus.thelio.carlboettiger.info {
-  tls cboettig@gmail.com
-  reverse_proxy prometheus:9090
-}
+#prometheus.thelio.carlboettiger.info {
+#  tls cboettig@gmail.com
+#  reverse_proxy prometheus:9090
+#}
 
 
-hash-archive.thelio.carlboettiger.info {
-  tls cboettig@gmail.com
-  reverse_proxy hash-archive:8000
-}
+#hash-archive.thelio.carlboettiger.info {
+#  tls cboettig@gmail.com
+#  reverse_proxy hash-archive:8000
+#}
 
 status.thelio.carlboettiger.info {
   tls cboettig@gmail.com
@@ -83,12 +72,12 @@ rstudio.thelio.carlboettiger.info {
 #}
 
 
-tensorboard.thelio.carlboettiger.info {
-  tls cboettig@gmail.com
-  reverse_proxy rstudio:2223 {
-    header_up Host {host}
-  }
-}
+#tensorboard.thelio.carlboettiger.info {
+#  tls cboettig@gmail.com
+#  reverse_proxy rstudio:2223 {
+#    header_up Host {host}
+#  }
+#}
 
 
 ## GitLab, based on: https://gitlab.com/gitlab-org/gitlab-recipes/-/blob/master/web-server/caddy/Caddyfile 
@@ -99,6 +88,22 @@ tensorboard.thelio.carlboettiger.info {
 #    }
 #}
 #
+
+#minikube.thelio.carlboettiger.info {
+#  tls cboettig@gmail.com
+#  reverse_proxy minikube:8080 {
+#    header_up Host {host}
+#  }
+#}
+
+minikube.thelio.carlboettiger.info {
+
+  reverse_proxy 10.103.183.240:80 {
+     header_up Host helloworld-python.default.10.103.183.240.sslip.io   
+  }  
+  tls cboettig@gmail.com
+ }
+
 
 
 
