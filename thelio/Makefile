@@ -1,4 +1,4 @@
-.PHONY: network caddy rstudio rstudio2 monitor gitlab
+sPHONY: network caddy rstudio rstudio2 monitor gitlab
 HERE=$(shell pwd)
 USER_HOME=/opt/rstudio/home
 URAP_HOME=/opt/urap
@@ -18,6 +18,14 @@ caddy:
 	--network minikube \
 	caddy
 
+shiny:
+	docker run --name shiny \
+	--detach \
+	--pull always \
+	--restart always \
+	--network minikube \
+	rocker/shiny-verse
+
 rstudio:
 	docker run --name rstudio \
 	--detach \
@@ -25,11 +33,13 @@ rstudio:
         --restart always \
 	--env-file private_env.sh \
 	-p 0.0.0.0:2220:22 \
+	-v ${HERE}/services.d/cron:/etc/services.d/cron \
+	-v ${HERE}/services.d/cron:/etc/services.d/tensorboard \
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
 	-v ${USER_HOME}:/home \
 	-v /var/log/tensorboard:/var/log/tensorboard \
 	--shm-size=20gb \
-        --memory 35g \
+        --memory 48g \
 	--network minikube \
 	--gpus all \
 	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
@@ -56,6 +66,12 @@ hash-archive:
 	-e URL=hash-archive.thelio.carlboettiger.info \
 	cboettig/hash-archive
 
+aqueduct:
+	docker run --name aqueduct \
+	--detach \
+	--network minikube \
+	aqueduct
+
 urap: 
 	docker volume create urap 
 
@@ -66,13 +82,14 @@ rstudio2:
 	--restart always \
 	--env-file private_env.sh \
 	--memory 15g \
-  	-v /var/log/tensorboard:/var/log/tensorboard \
+  	--shm-size=5.1gb \
+	-v /var/log/tensorboard:/var/log/tensorboard \
 	-v urap:/home \
 	-v ${HERE}/urap_users.sh:/etc/cont-init.d/addusers \
 	--network minikube \
 	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
 	--gpus all \
-	rocker/ml-verse:4.2.0-cuda11.1
+	rocker/ml-verse:4.2.1-cuda11.1
 
 minio: 
 	docker run --name minio \
@@ -165,17 +182,27 @@ mysql:
 		--restart always \
 		mariadb:latest
 
+vault: 
+	docker run --name vault \
+		--detach \
+		--network minikube \
+		--cap-add=IPC_LOCK \
+		-v /opt/vault/data:/vault/data \
+		-v ${HERE}/vault.hcl:/vault/config/config.hcl \
+		-e VAULT_ADDR=https://vault.thelio.carlboettiger.info \
+		vault server
+
 
 ## not currently active
 gitlab:
 	docker run --name gitlab \
-	-ti \
+	--restart always \
+	--detach \
 	--network minikube \
 	--hostname gitlab.carlboettiger.info \
-	-e GITLAB_OMNIBUS_CONFIG="external_url 'http://gitlab.carlboettiger.info'; nginx['listen_port'] = 8081; gitlab_rails['lfs_embedded'] = true; gitlab_rails['gitlab_shell_ssh_port'] = 2224" \
 	-v /data/gitlab/config:/etc/gitlab \
 	-v /data/gitlab/logs:/var/log/gitlab \
 	-v /data/gitlab/data:/var/opt/gitlab \
-	gitlab/gitlab-ce:13.3.5-ce.0
-
+	--shm-size 256m \
+	gitlab/gitlab-ee
 

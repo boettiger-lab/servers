@@ -5,12 +5,21 @@ thelio.carlboettiger.info {
   }
 }
 
-#shiny.thelio.carlboettiger.info {  
-#  tls cboettig@gmail.com
-#  reverse_proxy rstudio2:3838 {
-#    header_up Host {host}
-#  }
-#}
+
+aqueduct.thelio.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy aqueduct:8080 {
+    header_up Host {host}
+  }
+
+}
+
+shiny.thelio.carlboettiger.info {  
+  tls cboettig@gmail.com
+  reverse_proxy shiny:3838 {
+    header_up Host {host}
+  }
+}
 
 
 data.thelio.carlboettiger.info {
@@ -72,12 +81,21 @@ rstudio.thelio.carlboettiger.info {
 #}
 
 
-#tensorboard.thelio.carlboettiger.info {
-#  tls cboettig@gmail.com
-#  reverse_proxy rstudio:2223 {
-#    header_up Host {host}
-#  }
-#}
+tensorboard.thelio.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy rstudio:2223 {
+    header_up Host {host}
+  }
+}
+
+
+vault.thelio.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy vault:8200 {
+    header_up Host {host}
+  }
+}
+
 
 
 ## GitLab, based on: https://gitlab.com/gitlab-org/gitlab-recipes/-/blob/master/web-server/caddy/Caddyfile 
@@ -88,22 +106,4 @@ rstudio.thelio.carlboettiger.info {
 #    }
 #}
 #
-
-#minikube.thelio.carlboettiger.info {
-#  tls cboettig@gmail.com
-#  reverse_proxy minikube:8080 {
-#    header_up Host {host}
-#  }
-#}
-
-minikube.thelio.carlboettiger.info {
-
-  reverse_proxy 10.103.183.240:80 {
-     header_up Host helloworld-python.default.10.103.183.240.sslip.io   
-  }  
-  tls cboettig@gmail.com
- }
-
-
-
 
