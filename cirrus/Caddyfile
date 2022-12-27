@@ -1,3 +1,39 @@
+{
+    admin :2019
+}
+
+## Alias for EFI server 
+minio.carlboettiger.info {
+  tls cboettig@gmail.com
+	reverse_proxy nvme:9000 {
+  	  header_up X-Forwarded-Proto {scheme}
+    	header_up X-Forwarded-Host {host}
+    	header_up Host {host}
+    	health_path /minio/health/ready
+	}
+}
+
+data.carlboettiger.info {
+    tls cboettig@gmail.com
+    reverse_proxy nvme:9001 {
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-Host {host}
+        header_up Host {host}
+        health_path /minio/health/ready
+    }
+}
+
+
+millie.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+  reverse_proxy millie:8787 
+
+}
+
+
+
+
 status.cirrus.carlboettiger.info {
 
   tls cboettig@gmail.com
@@ -15,6 +51,27 @@ cirrus.carlboettiger.info {
   }
 
 }
+
+spatial.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+
+  reverse_proxy spatial:8787 {
+    header_up Host {host}
+  }
+
+}
+
+rstudio.carlboettiger.info {
+  
+  tls cboettig@gmail.com
+
+  reverse_proxy rstudio3:8787 {
+    header_up Host {host}
+  }
+
+}
+
 
 marcus.carlboettiger.info {
   
@@ -87,31 +144,20 @@ prometheus.cirrus.carlboettiger.info {
   reverse_proxy prometheus:9090
 }
 
-minio.carlboettiger.info {
-    tls cboettig@gmail.com
-    reverse_proxy minio_nvme:9000 {
-        header_up X-Forwarded-Proto {scheme}
-        header_up X-Forwarded-Host {host}
-        header_up Host {host}
-        health_path /minio/health/ready
-    }
-}
-
-data.carlboettiger.info {
-    tls cboettig@gmail.com
-    reverse_proxy minio_nvme:9001 {
-        header_up X-Forwarded-Proto {scheme}
-        header_up X-Forwarded-Host {host}
-        header_up Host {host}
-        health_path /minio/health/ready
-    }
-}
-
 
 hash-archive.carlboettiger.info {
   tls cboettig@gmail.com
   reverse_proxy hash-archive:8000
 }
 
+fishbase.ropensci.org {
+  tls cboettig@gmail.com
+  reverse_proxy minio:9000 {
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-Host {host}
+        header_up Host {host}
+        health_path /minio/health/ready
+    }
 
+}
 
