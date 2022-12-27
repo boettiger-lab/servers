@@ -8,4 +8,7 @@ prometheus.yml
 *.crt
 *.cert
 *.key
+addusers
+*.sh~
+*.sz~
 

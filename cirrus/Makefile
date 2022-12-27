@@ -1,8 +1,10 @@
 .PHONY: network caddy rstudio rstudio2 monitor gitlab
-	HERE=$(shell pwd)
-	MINIO=/minio
-	USER_HOME=/minio/home
-	network: 
+HERE=$(shell pwd)
+MINIO=/minio
+USER_HOME=/minio/home
+
+
+network: 
 	docker network create -d bridge cirrus-net
 
 caddy: 
@@ -29,9 +31,47 @@ rstudio:
 		-v /var/log/tensorboard:/var/log/tensorboard \
 		--memory 200g \
 		--shm-size=65gb \
+		--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm \
+		--device /dev/nvidia0:/dev/nvidia0 \
+		--device /dev/nvidia1:/dev/nvidia1 \
 		--gpus all \
 		--network cirrus-net \
-		rocker/ml-verse:4.1.3-cuda11.1
+		rocker/ml-verse:4.2.1-cuda11.1
+
+rstudio3:
+	docker run \
+		--name rstudio3 \
+		--detach \
+		--restart always \
+		--env-file private_env.sh \
+		-v rstudio3-volume:/home \
+		-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
+		-v /var/log/tensorboard:/var/log/tensorboard \
+		--memory 200g \
+		--shm-size=65gb \
+		--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
+		--gpus all \
+		--network cirrus-net \
+		rocker/ml-verse
+
+
+spatial:
+	docker run \
+		--name spatial \
+		--detach \
+		--pull always \
+		--restart always \
+		--env-file private_env.sh \
+		-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
+		--memory 200g \
+		--shm-size=65gb \
+		--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
+		--gpus all \
+		--network cirrus-net \
+		rocker/geospatial:dev-osgeo
+
+	##		rocker/geospatial:dev-osgeo
+
 
 marcus:
 	docker run \
@@ -46,13 +86,23 @@ marcus:
 		-v /var/log/tensorboard:/var/log/tensorboard \
 		--memory 200g \
 		--shm-size=65gb \
+		--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
+		--device /dev/nvidia1:/dev/nvidia1 \
 		--gpus all \
 		--network cirrus-net \
-		rocker/ml-verse:4.2.0-cuda11.1
+		rocker/ml-verse:4.2.1-cuda11.1
 
 
 urap: 
 	docker volume create urap
+
+
+rstudio3-volume: 
+	docker volume create rstudio3-volume 
+
+
+
+
 rstudio2:
 	docker run --name rstudio2 \
 		--pull always \
@@ -64,10 +114,30 @@ rstudio2:
 		-v /var/log/tensorboard:/var/log/tensorboard \
 		-v urap:/home \
 		--memory 50g \
+		--shm-size=20gb \
 		--network cirrus-net \
-		--gpus 0 \
+		--gpus 1 \
 		-p 0.0.0.0:2221:22 \
-		rocker/ml-verse:4.1.3-cuda10.1
+		rocker/ml-verse
+
+
+millie_home:
+	docker volume create millie_home
+
+millie:
+	docker run --name millie \
+		--env-file millie_env.sh \
+		--pull always \
+		--restart always \
+		--detach \
+		-v /var/log/tensorboard:/var/log/tensorboard \
+		-v millie_home:/home/mille \
+		--memory 100g \
+		--network cirrus-net \
+		--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
+		--gpus 0 \
+		-p 0.0.0.0:2223:22 \
+		rocker/geospatial
 
 
 ## Get host PGID from: 
@@ -106,15 +176,16 @@ minio:
 		-v /mnt/disk8:/data8 \
 		quay.io/minio/minio server /data{1...8} --console-address ":9001"	  
 
-minio_nvme: 
-	docker run --name minio_nvme \
+nvme: 
+	docker run --name nvme \
 		--pull always \
 		--restart always \
 		--detach \
 		--env-file minio_env_nvme.sh \
 		--network cirrus-net \
-		-v /mnt/nvme2:/data \
-		quay.io/minio/minio server /data --console-address ":9001"	  
+		-v /mnt/nvme2:/data1 \
+		-v /mnt/nvme3:/data2 \
+		quay.io/minio/minio server /data{1...2} --console-address ":9001"	  
 
 
 prometheus:
