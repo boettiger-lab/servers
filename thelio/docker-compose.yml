@@ -1,53 +1,19 @@
 version: '2.3'
 
+# an example docker-compose mechanism with caddy
 services:
   caddy:
-    image: abiosoft/caddy
-   ## public files in site, .caddy holds letsencrypt certs
+    image: caddy
     volumes:
-      - ./site/Caddyfile:/etc/Caddyfile
+      - ./Caddyfile:/etc/caddy/Caddyfile
       - ./.caddy/:/root/.caddy
     ports:
-      - 80:80
-      - 443:443
+      - 0.0.0.0:443:443
     restart: always
-    environment:
-      - ACME_AGREE=true
+
   rstudio:
-    runtime: nvidia
-    image: rocker/cuda-10.0
+    image: rocker/geospatial
     restart: always
     volumes:
-      - ./addusers.sh:/etc/cont-init.d/addusers
-      - home:/home
-        #      - /media/cboettig/ExtraDrive1:/data
-    env_file: ./private_env.sh
-
-volumes:
-  home:
-
-#  monitor:
-#    image: titpetric/netdata
-#    restart: always
-#    cap_add:
-#      - SYS_PTRACE
-#    volumes:
-#      - /proc:/host/proc:ro
-#      - /sys:/host/sys:ro
-#      - ./netdata.conf:/etc/netdata/netdata.conf
-#    ports:
-#      - 19999:19999
-##
-## FIXME consider binding these to volume on /media/cboettig/ExtraDrive1
-#  mariadb:
-#      image: mariadb
-#      environment:
-#          - MYSQL_ROOT_PASSWORD=password
-#  postgres:
-#      image: postgres
-#      environment:
-#          - POSTGRES_PASSWORD=password
-
-
-
-
+    environment:
+      - PASSWORD=yourpasswordhere
