@@ -5,14 +5,22 @@ thelio.carlboettiger.info {
   }
 }
 
-
-aqueduct.thelio.carlboettiger.info {
+carl.carlboettiger.info {  
   tls cboettig@gmail.com
-  reverse_proxy aqueduct:8080 {
+  reverse_proxy carl:8787 {
     header_up Host {host}
   }
-
 }
+
+
+
+#aqueduct.thelio.carlboettiger.info {
+#  tls cboettig@gmail.com
+#  reverse_proxy aqueduct:8080 {
+#    header_up Host {host}
+#  }
+#}
+
 
 shiny.thelio.carlboettiger.info {  
   tls cboettig@gmail.com
@@ -49,10 +57,10 @@ minio.thelio.carlboettiger.info {
 #}
 
 
-#hash-archive.thelio.carlboettiger.info {
-#  tls cboettig@gmail.com
-#  reverse_proxy hash-archive:8000
-#}
+hash-archive.thelio.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy hash-archive:8000
+}
 
 status.thelio.carlboettiger.info {
   tls cboettig@gmail.com
@@ -81,12 +89,12 @@ rstudio.thelio.carlboettiger.info {
 #}
 
 
-tensorboard.thelio.carlboettiger.info {
-  tls cboettig@gmail.com
-  reverse_proxy rstudio:2223 {
-    header_up Host {host}
-  }
-}
+#tensorboard.thelio.carlboettiger.info {
+#  tls cboettig@gmail.com
+#  reverse_proxy rstudio:2223 {
+#    header_up Host {host}
+#  }
+#}
 
 
 vault.thelio.carlboettiger.info {

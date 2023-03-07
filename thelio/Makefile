@@ -26,24 +26,40 @@ shiny:
 	--network minikube \
 	rocker/shiny-verse
 
-rstudio:
-	docker run --name rstudio \
-	--detach \
+nvidia_stable:
+	sudo nvidia-ctk system create-dev-char-symlinks --create-all
+
+carl:
+	docker run --name carl \
+	-detach \
 	--pull always \
         --restart always \
 	--env-file private_env.sh \
-	-p 0.0.0.0:2220:22 \
-	-v ${HERE}/services.d/cron:/etc/services.d/cron \
-	-v ${HERE}/services.d/cron:/etc/services.d/tensorboard \
-	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
-	-v ${USER_HOME}:/home \
-	-v /var/log/tensorboard:/var/log/tensorboard \
-	--shm-size=20gb \
-        --memory 48g \
 	--network minikube \
 	--gpus all \
+	-v carl_vol:/home/rstudio \
+       	--shm-size=20gb \
+ 	--memory 48g \
 	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
-	rocker/ml-verse:4.2.1-cuda11.1
+	rocker/ml-verse 
+
+
+# https://github.com/NVIDIA/nvidia-docker/issues/1671 NVML: Unknown error
+rstudio:
+	docker run --name rstudio \
+	-detach \
+	--pull always \
+        --restart always \
+	--env-file private_env.sh \
+	-v ${HERE}/services.d/cron:/etc/services.d/cron \
+	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
+	-v ${USER_HOME}:/home \
+	--network minikube \
+	--gpus all \
+       	--shm-size=20gb \
+ 	--memory 48g \
+	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
+	rocker/ml-verse 
 
 monitor: 
 	docker run --name monitor \
@@ -75,6 +91,9 @@ aqueduct:
 urap: 
 	docker volume create urap 
 
+carl_vol:
+	docker volume create carl_vol 
+
 rstudio2: 
 	docker run --name rstudio2 \
 	--detach \
@@ -83,13 +102,12 @@ rstudio2:
 	--env-file private_env.sh \
 	--memory 15g \
   	--shm-size=5.1gb \
-	-v /var/log/tensorboard:/var/log/tensorboard \
 	-v urap:/home \
 	-v ${HERE}/urap_users.sh:/etc/cont-init.d/addusers \
 	--network minikube \
 	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
 	--gpus all \
-	rocker/ml-verse:4.2.1-cuda11.1
+	rocker/ml-verse
 
 minio: 
 	docker run --name minio \
