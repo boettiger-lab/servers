@@ -31,7 +31,8 @@ rstudio:
 		-v /var/log/tensorboard:/var/log/tensorboard \
 		--memory 200g \
 		--shm-size=65gb \
-		--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm \
+		--device /dev/nvidiactl:/dev/nvidiactl \
+		--device /dev/nvidia-uvm:/dev/nvidia-uvm \
 		--device /dev/nvidia0:/dev/nvidia0 \
 		--device /dev/nvidia1:/dev/nvidia1 \
 		--gpus all \
