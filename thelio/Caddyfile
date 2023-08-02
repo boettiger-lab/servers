@@ -1,18 +1,92 @@
 thelio.carlboettiger.info {  
   tls cboettig@gmail.com
-  reverse_proxy rstudio:8787 {
+  reverse_proxy 127.0.0.1:8787 {
     header_up Host {host}
   }
 }
 
-carl.carlboettiger.info {  
+# zot container registy
+zcr.thelio.carlboettiger.info {
   tls cboettig@gmail.com
-  reverse_proxy carl:8787 {
+  reverse_proxy 127.0.0.1:5000 {
+    header_up Host {host}
+  }
+}
+
+## Permanent MINIO server is not hosted from container
+## this ensures persistence over harddrive failure over reboots. 
+## otherwise volume mapping means /mnt/disk3 disk fails, it will be interpreted as volume map to main drive
+data.thelio.carlboettiger.info {
+	tls cboettig@gmail.com
+	reverse_proxy 127.0.0.1:45461 {
+		header_up Host {host}
+		health_path /minio/health/ready
+	}
+}
+minio.thelio.carlboettiger.info {
+	tls cboettig@gmail.com
+	reverse_proxy 127.0.0.1:9000 {
+		header_up Host {host}
+		health_path /minio/health/ready
+	}
+}
+
+## This MINIO setup binds $HOME/shared-data in the NVME drive,
+## and uses a fully containerized MINIO instance
+s3.thelio.carlboettiger.info {
+	tls cboettig@gmail.com
+	reverse_proxy 127.0.0.1:9001 {
+		header_up Host {host}
+		health_path /minio/health/ready
+	}
+}
+nvme.thelio.carlboettiger.info {
+	tls cboettig@gmail.com
+	reverse_proxy 127.0.0.1:9002 {
+		header_up Host {host}
+		health_path /minio/health/ready
+	}
+}
+
+tensorboard.thelio.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy 127.0.0.1:6006
+}
+
+
+
+prometheus.thelio.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy 127.0.0.1:9090
+}
+
+status.thelio.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy 127.0.0.1:19999 
+}
+
+
+## docker network inspect thelionet
+## to see the IP address of internal container on subnet
+rstudio.thelio.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy 172.18.0.2:8787 {
+    header_up Host {host}
+  }
+}
+
+jupyter.thelio.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy 127.0.0.1:8888 {
     header_up Host {host}
   }
 }
 
 
+#hash-archive.thelio.carlboettiger.info {
+#  tls cboettig@gmail.com
+#  reverse_proxy hash-archive:8000
+#}
 
 #aqueduct.thelio.carlboettiger.info {
 #  tls cboettig@gmail.com
@@ -22,64 +96,15 @@ carl.carlboettiger.info {
 #}
 
 
-shiny.thelio.carlboettiger.info {  
-  tls cboettig@gmail.com
-  reverse_proxy shiny:3838 {
-    header_up Host {host}
-  }
-}
 
-
-data.thelio.carlboettiger.info {
-    tls cboettig@gmail.com
-    reverse_proxy minio:9001 {
-        header_up X-Forwarded-Proto {scheme}
-        header_up X-Forwarded-Host {host}
-        header_up Host {host}
-        health_path /minio/health/ready
-    }
-}
-
-
-minio.thelio.carlboettiger.info {
-    tls cboettig@gmail.com
-    reverse_proxy minio:9000 {
-        header_up X-Forwarded-Proto {scheme}
-        header_up X-Forwarded-Host {host}
-        header_up Host {host}
-        health_path /minio/health/ready
-    }
-}
-
-#prometheus.thelio.carlboettiger.info {
+#shiny.thelio.carlboettiger.info {  
 #  tls cboettig@gmail.com
-#  reverse_proxy prometheus:9090
-#}
-
-
-hash-archive.thelio.carlboettiger.info {
-  tls cboettig@gmail.com
-  reverse_proxy hash-archive:8000
-}
-
-status.thelio.carlboettiger.info {
-  tls cboettig@gmail.com
-  reverse_proxy monitor:19999 
-}
-
-rstudio.thelio.carlboettiger.info {
-  tls cboettig@gmail.com
-  reverse_proxy rstudio2:8787 {
-    header_up Host {host}
-  }
-}
-
-#jupyter.thelio.carlboettiger.info {
-#  tls cboettig@gmail.com
-#  reverse_proxy rstudio:8888 {
+#  reverse_proxy shiny:3838 {
 #    header_up Host {host}
 #  }
 #}
+
+
 
 #vscode.carlboettiger.info {
 #  tls cboettig@gmail.com
@@ -97,12 +122,12 @@ rstudio.thelio.carlboettiger.info {
 #}
 
 
-vault.thelio.carlboettiger.info {
-  tls cboettig@gmail.com
-  reverse_proxy vault:8200 {
-    header_up Host {host}
-  }
-}
+#vault.thelio.carlboettiger.info {
+#  tls cboettig@gmail.com
+#  reverse_proxy vault:8200 {
+#    header_up Host {host}
+#  }
+#}
 
 
 

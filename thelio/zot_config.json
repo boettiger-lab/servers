@@ -1,0 +1,32 @@
+{
+  "storage":{
+      "rootDirectory":"/var/lib/registry"
+  },
+  "http":{
+      "address":"0.0.0.0",
+      "port":"5000",
+      "auth": {
+        "failDelay": 5,
+        "htpasswd": {
+          "path": "/etc/zot/htpasswd"
+      	}
+      }
+  },
+  "log":{
+      "level":"debug"
+  },
+  "extensions": {
+    "search": {
+        "enable": true,
+        "cve": {
+            "updateInterval": "2h"
+        }
+    },
+    "ui": {
+        "enable": true
+    },
+    "mgmt": {
+      "enable": true
+    }
+  }
+}
