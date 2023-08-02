@@ -2,25 +2,20 @@ version: '2.3'
 
 services:
   caddy:
-    image: abiosoft/caddy
-   ## public files in site, .caddy holds letsencrypt certs
+    image: caddy
     volumes:
-      - ./site/Caddyfile:/etc/Caddyfile
-      - ./.caddy/:/root/.caddy
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./.caddy/:/data
     ports:
       - 80:80
       - 443:443
     restart: always
-    environment:
-      - ACME_AGREE=true
+
   rstudio:
-    runtime: nvidia
-    image: rocker/cuda-10.0
+    image: rocker/geospatial
     restart: always
     volumes:
-      - ./addusers.sh:/etc/cont-init.d/addusers
       - home:/home
-        #      - /media/cboettig/ExtraDrive1:/data
     env_file: ./private_env.sh
 
 volumes:
