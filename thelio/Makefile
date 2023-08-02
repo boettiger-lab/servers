@@ -1,10 +1,24 @@
-sPHONY: network caddy rstudio rstudio2 monitor gitlab
+PHONY: network caddy rstudio rstudio2 monitor gitlab
 HERE=$(shell pwd)
 USER_HOME=/opt/rstudio/home
 URAP_HOME=/opt/urap
 
-network: 
-	docker network create -d bridge minikube
+zot_vol:
+	docker volume create zot_vol
+
+zot: zot_vol
+	docker run --name zot --network host \
+	-v zot_vol:/var/lib/registry \
+	-v ${HERE}/zot_config.json:/etc/zot/config.json \
+ 	-v ${HERE}/zot.htpasswd:/etc/zot/htpasswd \
+	--detach ghcr.io/project-zot/zot-linux-amd64:latest
+
+
+nvidia_stable:
+	sudo nvidia-ctk system create-dev-char-symlinks --create-all
+
+#network: 
+#	docker network create -d bridge host
 
 
 caddy: 
@@ -15,34 +29,23 @@ caddy:
 	--restart always \
 	-v ${HERE}/Caddyfile:/etc/caddy/Caddyfile \
 	-v ${HERE}/.caddy/:/data \
-	--network minikube \
+	--network host \
 	caddy
 
-shiny:
-	docker run --name shiny \
-	--detach \
-	--pull always \
-	--restart always \
-	--network minikube \
-	rocker/shiny-verse
+jupyter_vol: 
+	docker volume create jupyter
 
-nvidia_stable:
-	sudo nvidia-ctk system create-dev-char-symlinks --create-all
-
-carl:
-	docker run --name carl \
+jupyter:
+	docker run --name jupyter \
 	-detach \
 	--pull always \
         --restart always \
-	--env-file private_env.sh \
-	--network minikube \
+	--network host \
 	--gpus all \
-	-v carl_vol:/home/rstudio \
        	--shm-size=20gb \
  	--memory 48g \
 	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
-	rocker/ml-verse 
-
+ 	pangeo/pytorch-notebook  jupyter lab --ip=0.0.0.0
 
 # https://github.com/NVIDIA/nvidia-docker/issues/1671 NVML: Unknown error
 rstudio:
@@ -54,10 +57,10 @@ rstudio:
 	-v ${HERE}/services.d/cron:/etc/services.d/cron \
 	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
 	-v ${USER_HOME}:/home \
-	--network minikube \
+	--network host \
 	--gpus all \
-       	--shm-size=20gb \
- 	--memory 48g \
+       	--shm-size=10gb \
+ 	--memory 32g \
 	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
 	rocker/ml-verse 
 
@@ -71,28 +74,30 @@ monitor:
 	-v /sys:/host/sys:ro \
 	-v /var/run/docker.sock:/var/run/docker.sock:ro \
 	-v ${HERE}/netdata.conf:/etc/netdata/netdata.conf \
-	--network minikube \
+	--network host \
 	netdata/netdata
+
+# NVME drive via MINIO connection
+minio: 
+	docker run --name minio \
+		--pull always \
+		--restart always \
+		--detach \
+		--env-file minio_env.sh \
+		--network host \
+		-v ${USER_HOME}/shared-data:/data \
+		quay.io/minio/minio server /data --address ":9002" --console-address ":9001"	  
+
 
 hash-archive:
 	docker run --name hash-archive \
 	--detach \
 	-v ${USER_HOME}/hash-archive.db:/hash-archive/hash-archive.db \
-	--network minikube \
+	--network host \
 	-e URL=hash-archive.thelio.carlboettiger.info \
 	cboettig/hash-archive
-
-aqueduct:
-	docker run --name aqueduct \
-	--detach \
-	--network minikube \
-	aqueduct
-
 urap: 
 	docker volume create urap 
-
-carl_vol:
-	docker volume create carl_vol 
 
 rstudio2: 
 	docker run --name rstudio2 \
@@ -104,43 +109,19 @@ rstudio2:
   	--shm-size=5.1gb \
 	-v urap:/home \
 	-v ${HERE}/urap_users.sh:/etc/cont-init.d/addusers \
-	--network minikube \
+	--network thelionet \
 	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
 	--gpus all \
 	rocker/ml-verse
-
-minio: 
-	docker run --name minio \
-	--detach \
-	--restart always \
-	--env-file minio_env.sh \
-	--network minikube \
-	-v /mnt/disk1:/data1 \
-	-v /mnt/disk2:/data2 \
-	-v /mnt/disk3:/data3 \
-	-v /mnt/disk4:/data4 \
-	quay.io/minio/minio server /data{1...4} --console-address ":9001"	  
 
 prometheus:
 	docker run \
 	--name prometheus \
 	--detach \
 	--restart always \
-	--network minikube \
+	--network host \
 	-v ${HERE}/prometheus.yml:/etc/prometheus/prometheus.yml \
 	prom/prometheus
-
-#kes:
-#	docker run \
-#	  --name kes \
-#	  --detach \
-#	  --network minikube \
-#	  -p 127.0.0.1:7373:7373 \
-#	  -v ${HERE}/certs:/certs \
-#	  -v ${HERE}/keys:/keys \
-#	  -v ${HERE}/server-config.yml:/data/server-config.yml \
-#	  -e MINIO_IDENTITY=f99b305aa6316fe2d89dec2056fa645e0fb808d9cd229816d0471e829cdcfc93 \
-#	  minio/kes:v0.17.2 server --config=/data/server-config.yml --auth=off
 
 ## NOTE: after launching container, you will need to do: 
 ## docker exec -ti <container> bash
@@ -179,31 +160,18 @@ github-runner3:
 	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
 	  rocker/safe-runner
 
-
-vscode: 
-	docker run --name vscode \
-	--detach \
-	--restart always \
-	-v ${HOME}/vscode:/home/rocker \
-	 --memory 35g \
-	--network minikube \
-	-- rocker/vscode
-#	-v "${HOME}/.config:/home/rocker/.config" \
-#	-v "${HOME}/.local/share/code-server:/home/rocker/.local/share/code-server" \
-
-
 ## occassional use, internal only
 mysql: 
 	docker run --name mariadb \
 		-d -e MYSQL_ROOT_PASSWORD=password \
-		--network minikube \
+		--network host \
 		--restart always \
 		mariadb:latest
 
 vault: 
 	docker run --name vault \
 		--detach \
-		--network minikube \
+		--network host \
 		--cap-add=IPC_LOCK \
 		-v /opt/vault/data:/vault/data \
 		-v ${HERE}/vault.hcl:/vault/config/config.hcl \
@@ -212,15 +180,48 @@ vault:
 
 
 ## not currently active
+shiny:
+	docker run --name shiny \
+	--detach \
+	--pull always \
+	--restart always \
+	--network host \
+	rocker/shiny-verse
+
 gitlab:
 	docker run --name gitlab \
 	--restart always \
 	--detach \
-	--network minikube \
+	--network host \
 	--hostname gitlab.carlboettiger.info \
 	-v /data/gitlab/config:/etc/gitlab \
 	-v /data/gitlab/logs:/var/log/gitlab \
 	-v /data/gitlab/data:/var/opt/gitlab \
 	--shm-size 256m \
 	gitlab/gitlab-ee
+
+aqueduct:
+	docker run --name aqueduct \
+	--detach \
+	--network host \
+	aqueduct
+
+carl: carl_vol
+	docker run --name carl \
+	-detach \
+	--pull always \
+        --restart always \
+	--env-file private_env.sh \
+	--network host \
+	--gpus all \
+	-v carl_vol:/home/rstudio \
+	-v ${HERE}/jupyter_server_config.py:/etc/jupyter/jupyter_server_config.py \
+       	--shm-size=20gb \
+ 	--memory 48g \
+	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
+	--user rstudio \
+	--workdir /home/rstudio \
+	rocker/ml-verse bash -c 'pip install jupyterlab && ~/.local/bin/jupyter lab --ip=0.0.0.0'
+
+
 
