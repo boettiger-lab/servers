@@ -1,4 +1,31 @@
+## nvidia driver mismatch
 
+Restart NVIDIA drivers without rebooting machine: 
+
+https://stackoverflow.com/a/45319156/258662
+
+Stop all GPU-binding tasks:
+
+```
+sudo lsof /dev/nvidia*
+```
+
+Then remove all nvidia modules:
+
+```
+lsmod | grep nvidia
+```
+
+e.g.
+
+```
+sudo rmmod nvidia_drm
+sudo rmmod nvidia_modeset
+sudo rmmod nvidia_uvm
+sudo rmmod nvidia
+```
+
+confirm `nvidia-smi` now works.
 
 ## hot-swap harddisk
 
