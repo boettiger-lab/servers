@@ -6,10 +6,13 @@
   
 ```
 sudo apt update && sudo apt install gpg ssh
+mkdir -p ~/.ssh
 gpg --recv 3908E1CFD28B380C
 gpg --export-ssh-key 3908E1CFD28B380C >> ~/.ssh/authorized_keys
 ```
 
+
+- Edit `/etc/hostname`
 
 - install & configure `ufw`, `fail2ban`, `tripwire`, `sshd`:
 
