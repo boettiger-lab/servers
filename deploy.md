@@ -14,10 +14,10 @@ gpg --export-ssh-key 3908E1CFD28B380C >> ~/.ssh/authorized_keys
 
 - Edit `/etc/hostname`
 
-- install & configure `ufw`, `fail2ban`, `tripwire`, `sshd`:
+- install & configure `ufw`, `sshd`:
 
 ```
-sudo apt update && sudo apt install ufw fail2ban tripwire ssh
+sudo apt update && sudo apt install ufw ssh
 ```
 
 
