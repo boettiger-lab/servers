@@ -27,6 +27,13 @@ sudo rmmod nvidia
 
 confirm `nvidia-smi` now works.
 
+## Update RAM allocation (or CPU, etc) on running container
+
+```bash
+docker update <container> -m 80G
+```
+
+
 ## hot-swap harddisk
 
 confirm hot-swap supported by kernel / bios
