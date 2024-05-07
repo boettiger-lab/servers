@@ -5,6 +5,19 @@ thelio.carlboettiger.info {
   }
 }
 
+jupyterhub.thelio.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy 10.43.83.195 {
+    header_up Host {host}
+  }
+}
+
+status.thelio.carlboettiger.info {
+  tls cboettig@gmail.com
+  reverse_proxy 127.0.0.1:19999 
+}
+
+
 # zot container registy
 zcr.thelio.carlboettiger.info {
   tls cboettig@gmail.com
@@ -48,95 +61,14 @@ nvme.thelio.carlboettiger.info {
 	}
 }
 
-tensorboard.thelio.carlboettiger.info {
-  tls cboettig@gmail.com
-  reverse_proxy 127.0.0.1:6006
-}
-
-
 
 prometheus.thelio.carlboettiger.info {
   tls cboettig@gmail.com
   reverse_proxy 127.0.0.1:9090
 }
 
-status.thelio.carlboettiger.info {
-  tls cboettig@gmail.com
-  reverse_proxy 127.0.0.1:19999 
-}
-
 
 ## docker network inspect thelionet
 ## to see the IP address of internal container on subnet
-rstudio.thelio.carlboettiger.info {
-  tls cboettig@gmail.com
-  reverse_proxy 172.18.0.2:8787 {
-    header_up Host {host}
-  }
-}
 
-jupyter.thelio.carlboettiger.info {
-  tls cboettig@gmail.com
-  reverse_proxy 127.0.0.1:8888 {
-    header_up Host {host}
-  }
-}
-
-
-#hash-archive.thelio.carlboettiger.info {
-#  tls cboettig@gmail.com
-#  reverse_proxy hash-archive:8000
-#}
-
-#aqueduct.thelio.carlboettiger.info {
-#  tls cboettig@gmail.com
-#  reverse_proxy aqueduct:8080 {
-#    header_up Host {host}
-#  }
-#}
-
-
-
-#shiny.thelio.carlboettiger.info {  
-#  tls cboettig@gmail.com
-#  reverse_proxy shiny:3838 {
-#    header_up Host {host}
-#  }
-#}
-
-
-
-#vscode.carlboettiger.info {
-#  tls cboettig@gmail.com
-#  reverse_proxy vscode:8080 {
-#    header_up Host {host}
-#  }
-#}
-
-
-#tensorboard.thelio.carlboettiger.info {
-#  tls cboettig@gmail.com
-#  reverse_proxy rstudio:2223 {
-#    header_up Host {host}
-#  }
-#}
-
-
-#vault.thelio.carlboettiger.info {
-#  tls cboettig@gmail.com
-#  reverse_proxy vault:8200 {
-#    header_up Host {host}
-#  }
-#}
-
-
-
-## GitLab, based on: https://gitlab.com/gitlab-org/gitlab-recipes/-/blob/master/web-server/caddy/Caddyfile 
-#gitlab.carlboettiger.info {
-#    tls cboettig@gmail.com
-#    reverse_proxy gitlab:8081 {
-#        header_up X-Forwarded-Ssl on
-#    }
-#}
-#
 

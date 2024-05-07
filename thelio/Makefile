@@ -1,18 +1,6 @@
 PHONY: network caddy rstudio rstudio2 monitor gitlab
 HERE=$(shell pwd)
-USER_HOME=/opt/rstudio/home
-URAP_HOME=/opt/urap
-
-zot_vol:
-	docker volume create zot_vol
-
-zot: zot_vol
-	docker run --name zot --network host \
-	-v zot_vol:/var/lib/registry \
-	-v ${HERE}/zot_config.json:/etc/zot/config.json \
- 	-v ${HERE}/zot.htpasswd:/etc/zot/htpasswd \
-	--detach ghcr.io/project-zot/zot-linux-amd64:latest
-
+USER_HOME=/home/cboettig/rstudio
 
 nvidia_stable:
 	sudo nvidia-ctk system create-dev-char-symlinks --create-all
@@ -35,58 +23,63 @@ caddy:
 jupyter_vol: 
 	docker volume create jupyter
 
-jupyter:
+jupyter: jupyter_vol
 	docker run --name jupyter \
 	-detach \
 	--pull always \
-        --restart always \
+  --restart always \
 	--network host \
+	--volume jupyter_vol:/home/joyvan \
 	--gpus all \
-       	--shm-size=20gb \
- 	--memory 48g \
+	--shm-size=20gb \
+	--memory 48g \
 	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
- 	pangeo/pytorch-notebook  jupyter lab --ip=0.0.0.0
+	pangeo/pytorch-notebook  jupyter lab --ip=0.0.0.0
 
 # https://github.com/NVIDIA/nvidia-docker/issues/1671 NVML: Unknown error
 rstudio:
 	docker run --name rstudio \
 	-detach \
 	--pull always \
-        --restart always \
+  --restart always \
 	--env-file private_env.sh \
 	-v ${HERE}/services.d/cron:/etc/services.d/cron \
-	-v ${HERE}/addusers.sh:/etc/cont-init.d/addusers \
 	-v ${USER_HOME}:/home \
 	--network host \
 	--gpus all \
-       	--shm-size=10gb \
- 	--memory 32g \
+	--shm-size=18gb \
+	--memory 52g \
+	--security-opt seccomp=unconfined \
 	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
 	rocker/ml-verse 
 
+# see docker run section on https://github.com/netdata/netdata/blob/132dbd5af4e150757ae6f32dc31f4d3933aedc91/collectors/python.d.plugin/nvidia_smi/README.md
 monitor: 
 	docker run --name monitor \
 	--detach \
 	--pull always \
+	--gpus all \
 	--restart always \
-	--cap-add SYS_PTRACE \
+  -e NETDATA_EXTRA_APK_PACKAGES=gcompat \
+  --cap-add SYS_PTRACE \
 	-v /proc:/host/proc:ro \
 	-v /sys:/host/sys:ro \
+	-v /etc/os-release:/host/etc/os-release:ro \
 	-v /var/run/docker.sock:/var/run/docker.sock:ro \
 	-v ${HERE}/netdata.conf:/etc/netdata/netdata.conf \
 	--network host \
 	netdata/netdata
 
-# NVME drive via MINIO connection
+# NVME drive via MINIO connection
 minio: 
 	docker run --name minio \
-		--pull always \
-		--restart always \
-		--detach \
-		--env-file minio_env.sh \
-		--network host \
-		-v ${USER_HOME}/shared-data:/data \
-		quay.io/minio/minio server /data --address ":9002" --console-address ":9001"	  
+	--pull always \
+	--restart always \
+	--detach \
+	--env-file minio_env.sh \
+	--network host \
+	-v ${USER_HOME}/shared-data:/data \
+	quay.io/minio/minio server /data --address ":9002" --console-address ":9001"		
 
 
 hash-archive:
@@ -96,6 +89,8 @@ hash-archive:
 	--network host \
 	-e URL=hash-archive.thelio.carlboettiger.info \
 	cboettig/hash-archive
+
+
 urap: 
 	docker volume create urap 
 
@@ -106,14 +101,16 @@ rstudio2:
 	--restart always \
 	--env-file private_env.sh \
 	--memory 15g \
-  	--shm-size=5.1gb \
+	--shm-size=5.1gb \
 	-v urap:/home \
 	-v ${HERE}/urap_users.sh:/etc/cont-init.d/addusers \
-	--network thelionet \
+	--network host \
+	-p 8787:8989 \
 	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
 	--gpus all \
 	rocker/ml-verse
 
+## configure prometheus.yml first!  see MINIO configuration
 prometheus:
 	docker run \
 	--name prometheus \
@@ -132,33 +129,33 @@ prometheus:
 ## You will need to make a github access token with sufficient scopes.
 github-runner:
 	docker run \
-      --restart always \
-      --memory 5g \
-	  --name github-runner \
-	  --detach \
-	  -e RUNNER_NAME=thelio1 \
-	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
-	  rocker/safe-runner
+    --restart always \
+    --memory 5g \
+		--name github-runner \
+		--detach \
+		-e RUNNER_NAME=thelio1 \
+		-e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
+		rocker/safe-runner
 
 github-runner2:
 	docker run \
-      --restart always \
-      --memory 5g \
-	  --name github-runner2 \
-	  --detach \
-	  -e RUNNER_NAME=thelio2 \
-	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
-	  rocker/safe-runner
+    --restart always \
+    --memory 5g \
+		--name github-runner2 \
+		--detach \
+		-e RUNNER_NAME=thelio2 \
+		-e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
+		rocker/safe-runner
 
 github-runner3:
 	docker run \
-      --restart always \
-      --memory 5g \
-	  --name github-runner3 \
-	  --detach \
-	  -e RUNNER_NAME=thelio3 \
-	  -e RUNNER_ORGANIZATION_URL=https://github.com/espm-157 \
-	  rocker/safe-runner
+    --restart always \
+    --memory 5g \
+		--name github-runner3 \
+		--detach \
+		-e RUNNER_NAME=thelio3 \
+		-e RUNNER_ORGANIZATION_URL=https://github.com/espm-288 \
+		rocker/safe-runner
 
 ## occassional use, internal only
 mysql: 
@@ -167,6 +164,23 @@ mysql:
 		--network host \
 		--restart always \
 		mariadb:latest
+
+## container registry service
+zot_vol:
+	docker volume create zot_vol
+
+zot: zot_vol
+	docker run --name zot --network host \
+	-v zot_vol:/var/lib/registry \
+	-v ${HERE}/zot_config.json:/etc/zot/config.json \
+	-v ${HERE}/zot.htpasswd:/etc/zot/htpasswd \
+	--detach ghcr.io/project-zot/zot-linux-amd64:latest
+
+
+
+#########################################################################
+###### not currently active  ############################################
+#########################################################################
 
 vault: 
 	docker run --name vault \
@@ -179,7 +193,7 @@ vault:
 		vault server
 
 
-## not currently active
+
 shiny:
 	docker run --name shiny \
 	--detach \
@@ -205,23 +219,4 @@ aqueduct:
 	--detach \
 	--network host \
 	aqueduct
-
-carl: carl_vol
-	docker run --name carl \
-	-detach \
-	--pull always \
-        --restart always \
-	--env-file private_env.sh \
-	--network host \
-	--gpus all \
-	-v carl_vol:/home/rstudio \
-	-v ${HERE}/jupyter_server_config.py:/etc/jupyter/jupyter_server_config.py \
-       	--shm-size=20gb \
- 	--memory 48g \
-	--device /dev/nvidiactl:/dev/nvidiactl --device /dev/nvidia-uvm:/dev/nvidia-uvm --device /dev/nvidia0:/dev/nvidia0 \
-	--user rstudio \
-	--workdir /home/rstudio \
-	rocker/ml-verse bash -c 'pip install jupyterlab && ~/.local/bin/jupyter lab --ip=0.0.0.0'
-
-
 
